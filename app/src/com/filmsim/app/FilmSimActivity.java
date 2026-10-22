@@ -5,6 +5,9 @@ import android.app.DAConnectionManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +19,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -133,6 +137,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private int playIndex;
     private OptimizedImage playImage;
     private Map<String, String> shotFilms = new HashMap<String, String>();
+    /** Shows the developed copy (halation, grain, leaks) over the original when one exists. */
+    private ImageView devView;
+    private Bitmap devBitmap;
+    private boolean showDeveloped = true;
 
     // Video: the camera is reopened in movie mode for recording, then back in photo mode afterwards.
     private MediaRecorder recorder;
@@ -1190,6 +1198,12 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         // just above the live view surface, below the info line
         root.addView(playView, 1, new RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        devView = new ImageView(this);
+        devView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        devView.setBackgroundColor(0xFF000000);
+        devView.setVisibility(View.GONE);
+        root.addView(devView, 2, new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         playInfo.setVisibility(View.VISIBLE);
         showPhoto();
     }
@@ -1205,6 +1219,12 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         }
         releasePlayImage();
         repaintSoon();
+        if (devView != null) {
+            devView.setImageBitmap(null);
+            root.removeView(devView);
+            devView = null;
+        }
+        releaseDevBitmap();
         if (playView != null) {
             root.removeView(playView);
             try {
@@ -1217,6 +1237,13 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         playInfo.setVisibility(View.GONE);
         surfaceView.setVisibility(View.VISIBLE);
         if (reopen && openCamera()) startShooting();
+    }
+
+    private void releaseDevBitmap() {
+        if (devBitmap != null) {
+            devBitmap.recycle();
+            devBitmap = null;
+        }
     }
 
     private void releasePlayImage() {
@@ -1252,6 +1279,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             case ScalarInput.ISV_KEY_S2:
                 closePlayback(true);
                 return true;
+            case ScalarInput.ISV_KEY_CUSTOM1:
+                showDeveloped = !showDeveloped;
+                showPhoto();
+                return true;
         }
         return true;
     }
@@ -1268,6 +1299,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         String data = playFiles.get(playIndex);
         OptimizedImage img = null;
         String info = "";
+        int orientation = 1;
         try {
             OptimizedImageFactory.Options o = new OptimizedImageFactory.Options();
             o.imageType = 3;
@@ -1280,6 +1312,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 int iso = ci.getAttributeInt(AvindexContentInfo.TAG_ISO, 0);
                 if (t > 0) info += (t < 1 ? "1/" + Math.round(1 / t) : String.format("%.1f\"", t)) + "   ";
                 if (iso > 0) info += "ISO " + iso + "   ";
+                orientation = ci.getAttributeInt(AvindexContentInfo.TAG_ORIENTATION, 1);
             }
             playView.setDisplayType(OptimizedImageView.DisplayType.DISPLAY_TYPE_CENTER_INNER);
             playView.setOptimizedImage(img);
@@ -1290,9 +1323,54 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         playImage = img;
         String name = new File(data).getName();
         String filmUsed = shotFilms.get(name.toUpperCase());
-        playInfo.setText(name + "   " + (filmUsed != null ? filmUsed + "   " : "") + info
+        File dev = new File(new File(new File(Environment.getExternalStorageDirectory(), "FILMSIM"), "DEV"),
+                Developer.outName(name) + ".JPG");
+        boolean hasDev = dev.isFile();
+        if (!hasDev || !showDeveloped) {
+            devView.setImageBitmap(null);
+            releaseDevBitmap();
+            devView.setVisibility(View.GONE);
+        }
+        boolean devShown = hasDev && showDeveloped && showDevCopy(dev, orientation);
+        String devLabel = !hasDev ? "" : devShown ? "DEVELOPED (C1: original)   " : "ORIGINAL (C1: developed)   ";
+        playInfo.setText(devLabel + name + "   " + (filmUsed != null ? filmUsed + "   " : "") + info
                 + (playIndex + 1) + "/" + playFiles.size() + "      < > browse   Play: back");
-        if (img == null) playInfo.append("\n(could not show this file)");
+        if (img == null && !devShown) playInfo.append("\n(could not show this file)");
+    }
+
+    /** Decodes the developed copy at screen size and shows it over the original. */
+    private boolean showDevCopy(File dev, int orientation) {
+        devView.setImageBitmap(null);
+        releaseDevBitmap();
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(dev.getPath(), o);
+            o.inJustDecodeBounds = false;
+            o.inSampleSize = 1;
+            while (o.outWidth / (o.inSampleSize * 2) >= 800) o.inSampleSize *= 2;
+            Bitmap b = BitmapFactory.decodeFile(dev.getPath(), o);
+            if (b == null) {
+                devView.setVisibility(View.GONE);
+                return false;
+            }
+            int deg = orientation == 6 ? 90 : orientation == 3 ? 180 : orientation == 8 ? 270 : 0;
+            if (deg != 0) {
+                Matrix m = new Matrix();
+                m.postRotate(deg);
+                Bitmap r = Bitmap.createBitmap(b, 0, 0, b.getWidth(), b.getHeight(), m, true);
+                if (r != b) b.recycle();
+                b = r;
+            }
+            devBitmap = b;
+            devView.setImageBitmap(b);
+            devView.setVisibility(View.VISIBLE);
+            return true;
+        } catch (Throwable t) {
+            log("showDevCopy failed: " + t);
+            devView.setVisibility(View.GONE);
+            return false;
+        }
     }
 
     /** Photo file name -> film it was shot with, from FILMSIM/SHOTS.TXT. */
