@@ -46,7 +46,7 @@ Turn these on in the Fn menu and the app makes a developed copy of each JPEG in 
 - **Grain** comes in Fine, Medium and Heavy. It sits in the midtones and shadows like real film grain, with a little colour for colour stocks and none for black and white
 - **Light leak** adds a soft warm leak coming in from one edge of the frame, different every shot
 
-Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at half the photo's width and height. Each one takes a little while, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. You need JPEG files for this, so set Quality to RAW & JPEG or JPEG.
+In Film Sim's playback you see the developed copy, and C1 switches to the original. Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at half the photo's width and height. Each one takes a little while, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. You need JPEG files for this, so set Quality to RAW & JPEG or JPEG.
 
 ## Film stocks
 
@@ -112,7 +112,7 @@ To remove the app, use **MENU > Application > Application Management** on the ca
 | C2 | Strength 100, 75, 50, 25%. In the menu, adds or removes the highlighted film from Favourites |
 | Up or DISP | Hide or show the info on screen |
 | MOVIE | Start and stop recording |
-| Play | Review photos. Left and right to browse, Play again to go back |
+| Play | Review photos. Left and right to browse, Play again to go back. If a photo has a developed copy it is shown instead, and C1 flips to the original |
 | MENU | Leave the app |
 
 ### The Fn menu
