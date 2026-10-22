@@ -14,6 +14,8 @@ You choose a film, the screen shows it in real time, and your JPEGs and videos c
 - Live preview of the look in the viewfinder and on the screen
 - The look is saved into your JPEGs and videos
 - Strength control from 0 to 100% for every look
+- Favourites, so the films you use most are at the top
+- Optional halation, film grain and light leaks, added to a copy of each JPEG after you shoot
 - Full manual exposure: shutter speed, ISO (including Auto), exposure compensation and the mode dial (P, A, S, M)
 - White balance presets and Kelvin in 100K steps
 - Focus magnifier for manual lenses
@@ -34,7 +36,17 @@ The catch is that a curve plus a matrix can't copy every film LUT perfectly. Eac
 - ★★☆ close
 - ★☆☆ a rough version of the look
 
-Effects that spread light around, like the red halation glow around lights on CineStill 800T, or grain, can't be done live. You still get the colour and contrast of those films.
+Effects that spread light around, like the red halation glow around lights on CineStill 800T, or grain, can't be done live. You still get the colour and contrast of those films live, and the app can add those effects afterwards (see below).
+
+## Halation, grain and light leaks
+
+Turn these on in the Fn menu and the app makes a developed copy of each JPEG in the background after you shoot. Your original file is never changed.
+
+- **Halation** adds the red orange glow that bleeds around lights on CineStill film
+- **Grain** comes in Fine, Medium and Heavy. It sits in the midtones and shadows like real film grain, with a little colour for colour stocks and none for black and white
+- **Light leak** adds a soft warm leak coming in from one edge of the frame, different every shot
+
+Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at half the photo's width and height. Each one takes a little while, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. You need JPEG files for this, so set Quality to RAW & JPEG or JPEG.
 
 ## Film stocks
 
@@ -90,18 +102,35 @@ To remove the app, use **MENU > Application > Application Management** on the ca
 |---|---|
 | Mode dial | P, A, S or M |
 | Rear dial | Shutter speed in S and M, exposure compensation in P and A |
-| Front dial | ISO. In the film picker it sets strength |
+| Front dial | ISO |
 | Exposure comp dial | Exposure compensation |
 | Control wheel (turn) | Next or previous film |
-| Fn | Open or close the film picker. Left and right change brand, up and down change film, Delete turns the film off |
-| Right button or C3 | Open or close white balance. Left and right change preset, up and down change Kelvin |
+| Fn | Open or close the menu (see below) |
+| C3 | Open the menu on white balance |
 | Centre button | Focus magnifier. Press again to zoom further, arrows move it, half press the shutter to leave |
 | C1 | Turn the look off and on to compare |
-| C2 | Strength 100, 75, 50, 25% |
+| C2 | Strength 100, 75, 50, 25%. In the menu, adds or removes the highlighted film from Favourites |
 | Up or DISP | Hide or show the info on screen |
 | MOVIE | Start and stop recording |
 | Play | Review photos. Left and right to browse, Play again to go back |
 | MENU | Leave the app |
+
+### The Fn menu
+
+Up and down pick a row, left and right (or the control wheel) change it. The look updates live as you scroll.
+
+| Row | What it changes |
+|---|---|
+| Brand | Favourites, Polaroid, Ilford, Kodak, Fujifilm, Cine |
+| Film | The film within that brand. Delete turns the film off |
+| Strength | 0 to 100% in 5% steps |
+| WB | Auto, Daylight, Shade, Cloudy, Tungsten, fluorescent types, Flash, Kelvin |
+| Kelvin | 100K steps, switches WB to Kelvin |
+| Halation | Off or On |
+| Grain | Off, Fine, Medium or Heavy |
+| Light leak | Off or On |
+
+Press Fn, centre or MENU to close it. Half pressing the shutter closes it too.
 
 ## Good to know
 
