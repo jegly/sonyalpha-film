@@ -69,6 +69,9 @@ public class Develop {
     private static final float[] GRAIN_STRENGTH = {0, 7f, 11f, 17f};
     private static final float[] GRAIN_CLUMP = {1, 1.1f, 1.6f, 2.3f};
 
+    private static final int LEAK_GRID = 8;    // light leak worked out every 8 px, then stretched
+    private static final int GRAIN_TILE = 512; // grain texture size, tiled across the photo
+
     // Light leak colours: red, orange, amber, and the occasional pink.
     private static final int[] LEAK_COLOURS = {0xFF3B1F, 0xFF7A1A, 0xFFB347, 0xFF2E6B};
 
@@ -122,78 +125,173 @@ public class Develop {
         }
         float leakNoise = w * 0.14f;
 
+        // The leak is soft, so work it out on a coarse grid and stretch it smoothly.
+        int lw = 0, lh = 0;
+        float[] leakR = null, leakG = null, leakB = null;
+        if (opt.lightLeak) {
+            lw = Math.max(2, w / LEAK_GRID + 2);
+            lh = Math.max(2, h / LEAK_GRID + 2);
+            leakR = new float[lw * lh];
+            leakG = new float[lw * lh];
+            leakB = new float[lw * lh];
+            for (int gy = 0; gy < lh; gy++) {
+                for (int gx = 0; gx < lw; gx++) {
+                    float x = gx * LEAK_GRID, y = gy * LEAK_GRID;
+                    float lr = 0, lg = 0, lb = 0;
+                    for (int i = 0; i < blobs; i++) {
+                        float dx = (x - bx[i]) / sx[i], dy = (y - by[i]) / sy[i];
+                        float d2 = dx * dx + dy * dy;
+                        if (d2 > 9) continue;
+                        // uneven edges: two slow random fields nudge the falloff
+                        float rough = 0.82f + 0.2f * valueNoise(x / leakNoise, y / leakNoise, noiseSeed + i * 7919)
+                                + 0.1f * valueNoise(x / (leakNoise * 0.4f), y / (leakNoise * 0.4f), noiseSeed + i * 7919 + 53);
+                        float t = (float) Math.exp(-d2) * amp[i] * rough;
+                        lr += t * col[i][0];
+                        lg += t * col[i][1];
+                        lb += t * col[i][2];
+                    }
+                    int k = gy * lw + gx;
+                    leakR[k] = lr;
+                    leakG[k] = lg;
+                    leakB[k] = lb;
+                }
+            }
+        }
+
+        // Grain from a pre-built tile (luma plus two colour channels), shifted per photo.
+        float[] tileL = null, tileR = null, tileB = null;
+        int tileX = rnd.nextInt(GRAIN_TILE), tileY = rnd.nextInt(GRAIN_TILE);
+        if (opt.grain > 0) {
+            tileL = new float[GRAIN_TILE * GRAIN_TILE];
+            tileR = new float[GRAIN_TILE * GRAIN_TILE];
+            tileB = new float[GRAIN_TILE * GRAIN_TILE];
+            for (int ty = 0; ty < GRAIN_TILE; ty++) {
+                for (int tx = 0; tx < GRAIN_TILE; tx++) {
+                    int k = ty * GRAIN_TILE + tx;
+                    tileL[k] = (0.65f * tileNoise(tx, ty, cell, noiseSeed) + 0.35f * tileNoise(tx, ty, cell * 2.3f, noiseSeed + 101))
+                            * strength * 1.6f;
+                    tileR[k] = tileNoise(tx, ty, cell, noiseSeed + 211) * strength * 0.45f;
+                    tileB[k] = tileNoise(tx, ty, cell, noiseSeed + 307) * strength * 0.45f;
+                }
+            }
+        }
+
         int[] band = new int[w * STRIP];
+        // per-row scratch: glow and leak maps interpolated down the column once per row
+        float[] coreRow = small == null ? null : new float[small.w];
+        float[] haloRow = tiny == null ? null : new float[tiny.w];
+        float[] leakRowR = leakR == null ? null : new float[lw];
+        float[] leakRowG = leakR == null ? null : new float[lw];
+        float[] leakRowB = leakR == null ? null : new float[lw];
+        // grain visibility by brightness: strongest in midtones and shadows, fading in highlights
+        float[] grainWeight = new float[256];
+        for (int i = 0; i < 256; i++) {
+            float l = i / 255f;
+            grainWeight[i] = 0.15f + 0.85f * Math.min(1f, 2.6f * (float) Math.sqrt(l) * (1 - l));
+        }
         float sxc = small == null ? 0 : small.w / (float) w, syc = small == null ? 0 : small.h / (float) h;
         float sxh = tiny == null ? 0 : tiny.w / (float) w, syh = tiny == null ? 0 : tiny.h / (float) h;
+        int tileMask = GRAIN_TILE - 1;
+
         for (int y0 = 0; y0 < h; y0 += STRIP) {
             if (gate != null && !gate.proceed()) throw new IOException("cancelled");
             int n = Math.min(STRIP, h - y0);
             src.read(y0, n, band);
             for (int r = 0; r < n; r++) {
                 int y = y0 + r;
-                float cy = (y + 0.5f) * syc - 0.5f, hy = (y + 0.5f) * syh - 0.5f;
                 int base = r * w;
+                boolean doHalation = opt.halation
+                        && rowAt(core, small.w, small.h, (y + 0.5f) * syc - 0.5f, coreRow) + rowAt(halo, tiny.w, tiny.h, (y + 0.5f) * syh - 0.5f, haloRow) > 0.002f;
+                boolean doLeak = opt.lightLeak && rowAt3(leakR, leakG, leakB, lw, lh, y / (float) LEAK_GRID, leakRowR, leakRowG, leakRowB) > 0.002f;
+                int tileRow = ((y + tileY) & tileMask) * GRAIN_TILE;
                 for (int x = 0; x < w; x++) {
                     int px = band[base + x];
                     float R = (px >> 16) & 255, G = (px >> 8) & 255, B = px & 255;
-                    if (opt.halation) {
-                        float c = sample(core, small.w, small.h, (x + 0.5f) * sxc - 0.5f, cy) * CORE_STRENGTH;
-                        float g = sample(halo, tiny.w, tiny.h, (x + 0.5f) * sxh - 0.5f, hy) * HALO_STRENGTH;
+                    if (doHalation) {
+                        float fx = (x + 0.5f) * sxc - 0.5f;
+                        int i0 = fx <= 0 ? 0 : (int) fx;
+                        if (i0 > small.w - 2) i0 = small.w - 2;
+                        float t = fx - i0;
+                        if (t < 0) t = 0;
+                        if (t > 1) t = 1;
+                        float c = (coreRow[i0] + (coreRow[i0 + 1] - coreRow[i0]) * t) * CORE_STRENGTH;
+                        fx = (x + 0.5f) * sxh - 0.5f;
+                        i0 = fx <= 0 ? 0 : (int) fx;
+                        if (i0 > tiny.w - 2) i0 = tiny.w - 2;
+                        t = fx - i0;
+                        if (t < 0) t = 0;
+                        if (t > 1) t = 1;
+                        float g = (haloRow[i0] + (haloRow[i0 + 1] - haloRow[i0]) * t) * HALO_STRENGTH;
                         if (c > 0.002f || g > 0.002f) {
                             R = screen(R, c * CORE_TINT[0] + g * HALO_TINT[0]);
                             G = screen(G, c * CORE_TINT[1] + g * HALO_TINT[1]);
                             B = screen(B, c * CORE_TINT[2] + g * HALO_TINT[2]);
                         }
                     }
-                    if (opt.lightLeak) {
-                        float lr = 0, lg = 0, lb = 0;
-                        for (int i = 0; i < blobs; i++) {
-                            float dx = (x - bx[i]) / sx[i], dy = (y - by[i]) / sy[i];
-                            float d2 = dx * dx + dy * dy;
-                            if (d2 > 9) continue;
-                            // uneven edges: two slow random fields nudge the falloff
-                            float rough = 0.82f + 0.2f * valueNoise(x / leakNoise, y / leakNoise, noiseSeed + i * 7919)
-                                    + 0.1f * valueNoise(x / (leakNoise * 0.4f), y / (leakNoise * 0.4f), noiseSeed + i * 7919 + 53);
-                            float t = (float) Math.exp(-d2) * amp[i] * rough;
-                            lr += t * col[i][0];
-                            lg += t * col[i][1];
-                            lb += t * col[i][2];
-                        }
+                    if (doLeak) {
+                        float fx = x / (float) LEAK_GRID;
+                        int i0 = (int) fx;
+                        if (i0 > lw - 2) i0 = lw - 2;
+                        float t = fx - i0;
+                        float lr = leakRowR[i0] + (leakRowR[i0 + 1] - leakRowR[i0]) * t;
                         if (lr > 0.002f) {
+                            float lg = leakRowG[i0] + (leakRowG[i0 + 1] - leakRowG[i0]) * t;
+                            float lb = leakRowB[i0] + (leakRowB[i0 + 1] - leakRowB[i0]) * t;
                             // a hot core burns towards yellow-white
-                            float hot = Math.max(0, lr - 0.75f);
+                            float hot = lr > 0.75f ? lr - 0.75f : 0;
                             R = screen(R, lr);
                             G = screen(G, lg + hot * 0.8f);
                             B = screen(B, lb + hot * 0.4f);
                         }
                     }
                     if (opt.grain > 0) {
-                        float lum = (0.299f * R + 0.587f * G + 0.114f * B) / 255f;
-                        if (lum < 0) lum = 0;
-                        if (lum > 1) lum = 1;
-                        // most visible in midtones and shadows, fading out in the highlights
-                        float weight = 0.15f + 0.85f * Math.min(1f, 2.6f * (float) Math.sqrt(lum) * (1 - lum));
-                        float gn = 0.65f * valueNoise(x / cell, y / cell, noiseSeed)
-                                + 0.35f * valueNoise(x / (cell * 2.3f), y / (cell * 2.3f), noiseSeed + 101);
-                        float d = gn * strength * weight * 1.6f;
+                        int li = (int) (0.299f * R + 0.587f * G + 0.114f * B);
+                        float weight = grainWeight[li < 0 ? 0 : li > 255 ? 255 : li];
+                        int k = tileRow + ((x + tileX) & tileMask);
+                        float d = tileL[k] * weight;
                         if (opt.monochrome) {
                             R += d;
                             G += d;
                             B += d;
                         } else {
-                            float cr = valueNoise(x / cell, y / cell, noiseSeed + 211) * strength * weight * 0.45f;
-                            float cb = valueNoise(x / cell, y / cell, noiseSeed + 307) * strength * weight * 0.45f;
+                            float cr = tileR[k] * weight, cb = tileB[k] * weight;
                             R += d + cr;
                             G += d - 0.5f * (cr + cb);
                             B += d + cb;
                         }
                     }
-                    band[base + x] = (clamp255(R) << 16) | (clamp255(G) << 8) | clamp255(B);
+                    int ir = R <= 0 ? 0 : R >= 255 ? 255 : (int) R;
+                    int ig = G <= 0 ? 0 : G >= 255 ? 255 : (int) G;
+                    int ib = B <= 0 ? 0 : B >= 255 ? 255 : (int) B;
+                    band[base + x] = (ir << 16) | (ig << 8) | ib;
                 }
             }
             out.writeRows(band, n);
         }
         out.finish();
+    }
+
+    /** Interpolates one row of a low-res map at fractional row fy into row; returns the row's maximum. */
+    private static float rowAt(float[] m, int w, int h, float fy, float[] row) {
+        if (fy < 0) fy = 0;
+        int y0 = (int) fy;
+        if (y0 > h - 2) y0 = h - 2;
+        float t = fy - y0;
+        if (t > 1) t = 1;
+        float max = 0;
+        int a = y0 * w, b = a + w;
+        for (int x = 0; x < w; x++) {
+            float v = m[a + x] + (m[b + x] - m[a + x]) * t;
+            row[x] = v;
+            if (v > max) max = v;
+        }
+        return max;
+    }
+
+    private static float rowAt3(float[] r, float[] g, float[] b, int w, int h, float fy, float[] rr, float[] gr, float[] br) {
+        rowAt(g, w, h, fy, gr);
+        rowAt(b, w, h, fy, br);
+        return rowAt(r, w, h, fy, rr);
     }
 
     private static float[] rgb(int c) {
@@ -202,6 +300,20 @@ public class Develop {
 
     private static int clamp255(float v) {
         return v <= 0 ? 0 : v >= 255 ? 255 : (int) v;
+    }
+
+    /** Grain noise that wraps around at the tile edge, so the tile repeats without a seam. */
+    private static float tileNoise(int x, int y, float cell, int seed) {
+        int period = Math.max(1, Math.round(GRAIN_TILE / cell));
+        float gx = x * period / (float) GRAIN_TILE, gy = y * period / (float) GRAIN_TILE;
+        int xi = (int) gx, yi = (int) gy;
+        float fx = gx - xi, fy = gy - yi;
+        fx = fx * fx * (3 - 2 * fx);
+        fy = fy * fy * (3 - 2 * fy);
+        float a = hash(xi % period, yi % period, seed), b = hash((xi + 1) % period, yi % period, seed);
+        float c = hash(xi % period, (yi + 1) % period, seed), d = hash((xi + 1) % period, (yi + 1) % period, seed);
+        float top = a + (b - a) * fx, bot = c + (d - c) * fx;
+        return top + (bot - top) * fy;
     }
 
     /** Smooth random field in [-1, 1]: hashed values on an integer grid, blended with a smoothstep curve. */
@@ -363,14 +475,15 @@ public class Develop {
         private final int width, height;
         private final int[] qY = new int[64], qC = new int[64];
         private final int[][] dcL, dcC, acL, acC; // [symbol] -> {code, length}
-        private final float[] cos = new float[64];
         private int bitBuf, bitCount;
         private int predY, predCb, predCr;
         private int rowsWritten;
         // one MCU row (16 rows) of Y, Cb, Cr at full and half resolution
         private final float[] y16, cb8, cr8;
         private final int mcuW;
-        private final float[] block = new float[64], coef = new float[64], dctTmp = new float[64];
+        private final float[] block = new float[64];
+        private final float[] divY = new float[64], divC = new float[64];
+        private static final double[] AAN = {1.0, 1.387039845, 1.306562965, 1.175875602, 1.0, 0.785694958, 0.541196100, 0.275899379};
         private final int[] zz = new int[64];
 
         public JpegWriter(OutputStream out, int width, int height, int quality, byte[] exifApp1) throws IOException {
@@ -382,13 +495,15 @@ public class Develop {
                 qY[i] = Math.max(1, Math.min(255, (LUMA_Q[i] * scale + 50) / 100));
                 qC[i] = Math.max(1, Math.min(255, (CHROMA_Q[i] * scale + 50) / 100));
             }
+            for (int i = 0; i < 64; i++) {
+                double sc = AAN[i / 8] * AAN[i % 8] * 8.0;
+                divY[i] = (float) (1.0 / (qY[i] * sc));
+                divC[i] = (float) (1.0 / (qC[i] * sc));
+            }
             dcL = huff(DC_L_BITS, DC_L_VAL);
             dcC = huff(DC_C_BITS, DC_C_VAL);
             acL = huff(AC_L_BITS, AC_L_VAL);
             acC = huff(AC_C_BITS, AC_C_VAL);
-            for (int u = 0; u < 8; u++) {
-                for (int x = 0; x < 8; x++) cos[u * 8 + x] = (float) Math.cos((2 * x + 1) * u * Math.PI / 16);
-            }
             mcuW = (width + 15) / 16;
             y16 = new float[mcuW * 16 * 16];
             cb8 = new float[mcuW * 8 * 8];
@@ -489,23 +604,11 @@ public class Develop {
         }
 
         private int encodeBlock(int[] q, int[][] dc, int[][] ac, int pred) throws IOException {
-            // separable forward DCT
-            float[] t = dctTmp;
-            for (int y = 0; y < 8; y++) {
-                for (int u = 0; u < 8; u++) {
-                    float s = 0;
-                    for (int x = 0; x < 8; x++) s += block[y * 8 + x] * cos[u * 8 + x];
-                    t[y * 8 + u] = s * (u == 0 ? 0.35355339f : 0.5f);
-                }
-            }
-            for (int u = 0; u < 8; u++) {
-                for (int v = 0; v < 8; v++) {
-                    float s = 0;
-                    for (int y = 0; y < 8; y++) s += t[y * 8 + u] * cos[v * 8 + y];
-                    coef[v * 8 + u] = s * (v == 0 ? 0.35355339f : 0.5f);
-                }
-            }
-            for (int i = 0; i < 64; i++) zz[i] = Math.round(coef[ZIGZAG[i]] / q[ZIGZAG[i]]);
+            float[] d = block;
+            for (int i = 0; i < 64; i += 8) fdct8(d, i, 1);
+            for (int i = 0; i < 8; i++) fdct8(d, i, 8);
+            float[] div = q == qY ? divY : divC;
+            for (int i = 0; i < 64; i++) zz[i] = Math.round(d[ZIGZAG[i]] * div[ZIGZAG[i]]);
             int diff = zz[0] - pred;
             int cat = category(diff);
             emit(dc[cat]);
@@ -527,6 +630,34 @@ public class Develop {
             }
             if (run > 0) emit(ac[0x00]);
             return zz[0];
+        }
+
+        /** One 8-point AAN forward DCT pass over d[o], d[o + step], ... */
+        private static void fdct8(float[] d, int o, int step) {
+            int i0 = o, i1 = o + step, i2 = o + 2 * step, i3 = o + 3 * step, i4 = o + 4 * step, i5 = o + 5 * step, i6 = o + 6 * step,
+                    i7 = o + 7 * step;
+            float t0 = d[i0] + d[i7], t7 = d[i0] - d[i7];
+            float t1 = d[i1] + d[i6], t6 = d[i1] - d[i6];
+            float t2 = d[i2] + d[i5], t5 = d[i2] - d[i5];
+            float t3 = d[i3] + d[i4], t4 = d[i3] - d[i4];
+            float t10 = t0 + t3, t13 = t0 - t3, t11 = t1 + t2, t12 = t1 - t2;
+            d[i0] = t10 + t11;
+            d[i4] = t10 - t11;
+            float z1 = (t12 + t13) * 0.707106781f;
+            d[i2] = t13 + z1;
+            d[i6] = t13 - z1;
+            t10 = t4 + t5;
+            t11 = t5 + t6;
+            t12 = t6 + t7;
+            float z5 = (t10 - t12) * 0.382683433f;
+            float z2 = 0.541196100f * t10 + z5;
+            float z4 = 1.306562965f * t12 + z5;
+            float z3 = t11 * 0.707106781f;
+            float z11 = t7 + z3, z13 = t7 - z3;
+            d[i5] = z13 + z2;
+            d[i3] = z13 - z2;
+            d[i1] = z11 + z4;
+            d[i7] = z11 - z4;
         }
 
         private static int category(int v) {

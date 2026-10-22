@@ -154,6 +154,9 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private Developer developer;
     private int developing;
     private FilmLibrary.Film shotFilm;
+    /** Newest files before the next shot. The camera's clock can't be trusted (it reads 1970), so new files are
+     * the ones that weren't there before. */
+    private File knownPhoto, knownJpeg;
     private long exitConfirmUntil;
 
     private FileWriter log;
@@ -221,6 +224,9 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         openLog();
         notifyAppInfo();
         restorePrefs();
+        File dcim = new File(Environment.getExternalStorageDirectory(), "DCIM");
+        knownPhoto = newestPhoto(dcim);
+        knownJpeg = newestJpeg(dcim);
         if (!openCamera()) return;
         readCapabilities();
         startShooting();
@@ -1101,8 +1107,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             }, 1000);
             return;
         }
-        File newest = newestPhoto(new File(Environment.getExternalStorageDirectory(), "DCIM"));
-        String name = newest != null && newest.lastModified() > shotTime - 60000 ? newest.getName() : "?";
+        File dcim = new File(Environment.getExternalStorageDirectory(), "DCIM");
+        File newest = newestPhoto(dcim);
+        String name = newest != null && !newest.equals(knownPhoto) ? newest.getName() : "?";
+        knownPhoto = newest;
         try {
             File dir = new File(Environment.getExternalStorageDirectory(), "FILMSIM");
             dir.mkdirs();
@@ -1115,9 +1123,12 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         } catch (IOException e) {
             log("shot log failed: " + e);
         }
+        if (!developOn()) knownJpeg = newestJpeg(dcim);
         if (developOn()) {
-            File jpeg = newestJpeg(new File(Environment.getExternalStorageDirectory(), "DCIM"));
-            if (jpeg != null && jpeg.lastModified() > shotTime - 60000) {
+            File jpeg = newestJpeg(dcim);
+            boolean fresh = jpeg != null && !jpeg.equals(knownJpeg);
+            knownJpeg = jpeg;
+            if (fresh) {
                 Develop.Options opt = new Develop.Options();
                 opt.halation = halation;
                 opt.grain = grain;
