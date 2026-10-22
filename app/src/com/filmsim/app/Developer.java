@@ -39,6 +39,8 @@ public class Developer {
     private final java.util.HashMap<File, Develop.Options> options = new java.util.HashMap<File, Develop.Options>();
     private volatile boolean cancelled;
     private Thread worker;
+    /** Size, effects and time per stage of the last copy, for the log. */
+    public volatile String lastTiming = "";
 
     public Developer(File outDir, Listener listener) {
         this.outDir = outDir;
@@ -161,7 +163,8 @@ public class Developer {
         OutputStream os = new BufferedOutputStream(new FileOutputStream(tmp), 64 * 1024);
         boolean ok = false;
         try {
-            new Develop(opt).process(source, new Develop.JpegWriter(os, w, h, 92, exif), new Develop.Gate() {
+            Develop dev = new Develop(opt);
+            dev.process(source, new Develop.JpegWriter(os, w, h, 92, exif), new Develop.Gate() {
                 public boolean proceed() {
                     while (!cancelled && listener.cameraBusy()) {
                         try {
@@ -174,6 +177,8 @@ public class Developer {
                 }
             });
             ok = true;
+            lastTiming = w + "x" + h + " " + (opt.halation ? "halation " : "") + (opt.grain > 0 ? "grain" + opt.grain + " " : "")
+                    + (opt.lightLeak ? "leak " : "") + "| " + dev.timing;
         } finally {
             os.close();
             decoder.recycle();

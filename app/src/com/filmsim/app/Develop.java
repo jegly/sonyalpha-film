@@ -76,12 +76,15 @@ public class Develop {
     private static final int[] LEAK_COLOURS = {0xFF3B1F, 0xFF7A1A, 0xFFB347, 0xFF2E6B};
 
     private final Options opt;
+    /** Where the time went on the last run, for the log. */
+    public String timing = "";
 
     public Develop(Options options) {
         this.opt = options;
     }
 
     public void process(Source src, JpegWriter out, Gate gate) throws IOException {
+        long startNs = System.nanoTime();
         int w = src.width(), h = src.height();
         // halation glow maps from small previews: the core at about 1/4 size, the halo at about 1/16
         Image small = null, tiny = null;
@@ -111,16 +114,16 @@ public class Develop {
         float[][] col = new float[blobs][];
         float edge = vertical ? h : w, along = vertical ? w : h;
         for (int i = 0; i < blobs; i++) {
-            float across = edge * (-0.06f + rnd.nextFloat() * 0.1f);   // centre just outside or at the edge
+            float across = edge * (-0.03f + rnd.nextFloat() * 0.1f);   // centre at the edge or a little inside
             float pos = along * (0.1f + rnd.nextFloat() * 0.8f);
-            float sAcross = edge * (0.10f + rnd.nextFloat() * 0.18f);
-            float sAlong = along * (0.18f + rnd.nextFloat() * 0.35f);
+            float sAcross = edge * (0.14f + rnd.nextFloat() * 0.2f);
+            float sAlong = along * (0.22f + rnd.nextFloat() * 0.35f);
             if (far) across = edge - 1 - across;
             bx[i] = vertical ? pos : across;
             by[i] = vertical ? across : pos;
             sx[i] = vertical ? sAlong : sAcross;
             sy[i] = vertical ? sAcross : sAlong;
-            amp[i] = 0.45f + rnd.nextFloat() * 0.4f;
+            amp[i] = i == 0 ? 0.85f + rnd.nextFloat() * 0.2f : 0.5f + rnd.nextFloat() * 0.4f;
             col[i] = rgb(LEAK_COLOURS[rnd.nextInt(10) == 0 ? 3 : rnd.nextInt(3)]);
         }
         float leakNoise = w * 0.14f;
@@ -193,10 +196,14 @@ public class Develop {
         float sxh = tiny == null ? 0 : tiny.w / (float) w, syh = tiny == null ? 0 : tiny.h / (float) h;
         int tileMask = GRAIN_TILE - 1;
 
+        long tRead = 0, tFx = 0, tEnc = 0, tPrep = System.nanoTime() - startNs;
         for (int y0 = 0; y0 < h; y0 += STRIP) {
             if (gate != null && !gate.proceed()) throw new IOException("cancelled");
             int n = Math.min(STRIP, h - y0);
+            long t0 = System.nanoTime();
             src.read(y0, n, band);
+            long t1 = System.nanoTime();
+            tRead += t1 - t0;
             for (int r = 0; r < n; r++) {
                 int y = y0 + r;
                 int base = r * w;
@@ -240,8 +247,14 @@ public class Develop {
                             // a hot core burns towards yellow-white
                             float hot = lr > 0.75f ? lr - 0.75f : 0;
                             R = screen(R, lr);
-                            G = screen(G, lg + hot * 0.8f);
-                            B = screen(B, lb + hot * 0.4f);
+                            G = screen(G, lg + hot * 0.55f);
+                            B = screen(B, lb + hot * 0.25f);
+                            // fogged film loses its own colour under the leak: pull towards the leak's hue
+                            float pull = Math.min(0.55f, lr * 0.5f);
+                            float tr = 255, tg = 255 * Math.min(1, lg / lr + hot * 0.6f), tb = 255 * Math.min(1, lb / lr + hot * 0.3f);
+                            R += (tr - R) * pull;
+                            G += (tg - G) * pull;
+                            B += (tb - B) * pull;
                         }
                     }
                     if (opt.grain > 0) {
@@ -266,9 +279,14 @@ public class Develop {
                     band[base + x] = (ir << 16) | (ig << 8) | ib;
                 }
             }
+            long t2 = System.nanoTime();
+            tFx += t2 - t1;
             out.writeRows(band, n);
+            tEnc += System.nanoTime() - t2;
         }
         out.finish();
+        timing = "prep " + tPrep / 1000000 + " ms, read " + tRead / 1000000 + " ms, effects " + tFx / 1000000
+                + " ms, encode " + tEnc / 1000000 + " ms";
     }
 
     /** Interpolates one row of a low-res map at fractional row fy into row; returns the row's maximum. */

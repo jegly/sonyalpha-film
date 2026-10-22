@@ -195,7 +195,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                     public void onDone(final String source, final File result, final long millis) {
                         runOnUiThread(new Runnable() {
                             public void run() {
-                                log("developed " + source + " -> " + result.getName() + " in " + millis + " ms");
+                                log("developed " + source + " -> " + result.getName() + " in " + millis + " ms: " + developer.lastTiming);
                                 showMessage("Developed copy saved: " + result.getName() + " (" + (millis / 1000) + " s)");
                             }
                         });
