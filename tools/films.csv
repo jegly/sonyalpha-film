@@ -1,0 +1,139 @@
+# LUT file (from FilmCamera res/raw) or design:<id> (tools Designer) | name shown on the camera | brand | type
+# LUT entries: one per film, using the variant that converts most accurately to the camera's curve + matrix.
+# Brand order: Polaroid, Ilford, Kodak, Fujifilm, then Cine (designed looks first, then cinema prints).
+lut_bw_polaroid_664.cube|664|Polaroid|Black & white
+lut_instant_pro_polaroid_665_m.cube|665|Polaroid|Instant
+lut_instant_pro_polaroid_665_negative_p.cube|665 Negative|Polaroid|Instant
+lut_instant_pro_polaroid_665_negative_hc.cube|665 Negative HC|Polaroid|Instant
+lut_bw_polaroid_667.cube|667|Polaroid|Black & white
+lut_instant_pro_polaroid_669_pp.cube|669|Polaroid|Instant
+lut_instant_pro_polaroid_669_cold_mm.cube|669 Cold|Polaroid|Instant
+lut_bw_polaroid_672.cube|672|Polaroid|Black & white
+lut_instant_pro_polaroid_690_pp.cube|690|Polaroid|Instant
+lut_instant_pro_polaroid_690_cold_pp.cube|690 Cold|Polaroid|Instant
+lut_instant_pro_polaroid_690_warm_pp.cube|690 Warm|Polaroid|Instant
+lut_colorslide_polaroid_polachrome.cube|Polachrome|Polaroid|Slide
+lut_instant_consumer_polaroid_px_m100uv_p_cold_pp.cube|PX-100UV+ Cold|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m100uv_p_warm_pp.cube|PX-100UV+ Warm|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m680_p.cube|PX-680|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m680_cold_pp_alt.cube|PX-680 Cold|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m680_warm_p.cube|PX-680 Warm|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m70_ppp.cube|PX-70|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m70_cold_mm.cube|PX-70 Cold|Polaroid|Instant
+lut_instant_consumer_polaroid_px_m70_warm_pp.cube|PX-70 Warm|Polaroid|Instant
+lut_instant_consumer_polaroid_time_zero_expired_p.cube|Time Zero Expired|Polaroid|Instant
+lut_instant_consumer_polaroid_time_zero_expired_cold.cube|Time Zero Expired Cold|Polaroid|Instant
+lut_bw_ilford_delta_100.cube|Delta 100|Ilford|Black & white
+lut_negative_old_ilford_delta_3200_pp.cube|Delta 3200|Ilford|Colour
+lut_bw_ilford_delta_400.cube|Delta 400|Ilford|Black & white
+lut_bw_ilford_fp_4_plus_125.cube|FP4 Plus 125|Ilford|Black & white
+lut_bw_ilford_hp_5_plus_400.cube|HP5 Plus 400|Ilford|Black & white
+lut_bw_ilford_hps_800.cube|HPS 800|Ilford|Black & white
+lut_bw_ilford_pan_f_plus_50.cube|Pan F Plus 50|Ilford|Black & white
+lut_bw_ilford_xp_2.cube|XP2|Ilford|Black & white
+lut_bw_kodak_bw_400_cn.cube|BW400CN|Kodak|Black & white
+design:kodak_colorplus_200|ColorPlus 200|Kodak|Colour
+lut_colorslide_kodak_ektachrome_100_vs_generic.cube|Ektachrome 100VS|Kodak|Slide
+lut_colorslide_kodak_e_m100_gx_ektachrome_100.cube|Ektachrome E100GX|Kodak|Slide
+lut_negative_color_kodak_ektar_100.cube|Ektar 100|Kodak|Colour
+lut_negative_color_kodak_elite_100_xpro.cube|Elite 100 X-Pro|Kodak|Cross-process
+lut_colorslide_kodak_elite_chrome_200.cube|Elite Chrome 200|Kodak|Slide
+lut_colorslide_kodak_elite_chrome_400.cube|Elite Chrome 400|Kodak|Slide
+lut_negative_color_kodak_elite_color_200.cube|Elite Color 200|Kodak|Colour
+lut_negative_color_kodak_elite_color_400.cube|Elite Color 400|Kodak|Colour
+lut_colorslide_kodak_elite_extracolor_100.cube|Elite Extracolor 100|Kodak|Slide
+lut_kodak_gold200.cube|Gold 200|Kodak|Colour
+design:kodak_gold_200_warm|Gold 200 Warm|Kodak|Colour
+lut_bw_kodak_hie_hs_infra.cube|HIE Infrared|Kodak|Infrared
+lut_colorslide_kodak_kodachrome_200.cube|Kodachrome 200|Kodak|Slide
+lut_colorslide_kodak_kodachrome_25.cube|Kodachrome 25|Kodak|Slide
+lut_colorslide_kodak_kodachrome_64_generic.cube|Kodachrome 64|Kodak|Slide
+design:kodak_portra_160|Portra 160|Kodak|Colour
+lut_negative_old_kodak_portra_160_nc_pp.cube|Portra 160 NC|Kodak|Colour
+lut_negative_old_kodak_portra_160_vc_m.cube|Portra 160 VC|Kodak|Colour
+lut_kodak_portra400.cube|Portra 400|Kodak|Colour
+lut_negative_old_kodak_portra_400_nc.cube|Portra 400 NC|Kodak|Colour
+lut_negative_old_kodak_portra_400_uc_m.cube|Portra 400 UC|Kodak|Colour
+lut_negative_old_kodak_portra_400_vc_m.cube|Portra 400 VC|Kodak|Colour
+design:kodak_portra_800|Portra 800|Kodak|Colour
+lut_negative_new_kodak_portra_800_hc.cube|Portra 800 HC|Kodak|Colour
+lut_bw_kodak_t_mmax_100.cube|T-Max 100|Kodak|Black & white
+lut_negative_new_kodak_tmax_3200_pp.cube|T-Max 3200|Kodak|Colour
+lut_bw_kodak_t_mmax_400.cube|T-Max 400|Kodak|Black & white
+lut_negative_new_kodak_tri_mx_400_alt.cube|Tri-X 400|Kodak|Colour
+design:kodak_ultramax_400|Ultramax 400|Kodak|Colour
+lut_negative_new_fuji_160c_m.cube|160C|Fujifilm|Colour
+lut_negative_new_fuji_800z_m.cube|800Z|Fujifilm|Colour
+lut_colorslide_fuji_astia_100_generic.cube|Astia 100|Fujifilm|Slide
+lut_colorslide_fuji_astia_100f.cube|Astia 100F|Fujifilm|Slide
+design:fuji_c200|C200|Fujifilm|Colour
+lut_instant_pro_fuji_fp_m100c_ppp.cube|FP-100C|Fujifilm|Instant
+lut_instant_pro_fuji_fp_m100c_cool_pp.cube|FP-100C Cool|Fujifilm|Instant
+lut_instant_pro_fuji_fp_m100c_negative_ppp.cube|FP-100C Negative|Fujifilm|Instant
+lut_colorslide_fuji_fp_100c.cube|FP-100C Slide|Fujifilm|Slide
+lut_instant_pro_fuji_fp_m3000b_ppp.cube|FP-3000B|Fujifilm|Instant
+lut_instant_pro_fuji_fp_m3000b_hc.cube|FP-3000B HC|Fujifilm|Instant
+lut_instant_pro_fuji_fp_m3000b_negative_mm.cube|FP-3000B Negative|Fujifilm|Instant
+lut_instant_pro_fuji_fp_m3000b_negative_early.cube|FP-3000B Negative Early|Fujifilm|Instant
+lut_negative_old_fuji_neopan_1600_m.cube|Neopan 1600|Fujifilm|Colour
+lut_bw_fuji_neopan_acros_100.cube|Neopan Acros 100|Fujifilm|Black & white
+design:fuji_pro_400h|Pro 400H|Fujifilm|Colour
+lut_colorslide_fuji_provia_100_generic.cube|Provia 100|Fujifilm|Slide
+lut_colorslide_fuji_provia_100f.cube|Provia 100F|Fujifilm|Slide
+lut_colorslide_fuji_provia_400f.cube|Provia 400F|Fujifilm|Slide
+lut_colorslide_fuji_provia_400x.cube|Provia 400X|Fujifilm|Slide
+lut_colorslide_fuji_sensia_100.cube|Sensia 100|Fujifilm|Slide
+lut_negative_old_fuji_superia_100_m.cube|Superia 100|Fujifilm|Colour
+lut_negative_old_fuji_superia_1600_pp.cube|Superia 1600|Fujifilm|Colour
+lut_negative_color_fuji_superia_200.cube|Superia 200|Fujifilm|Colour
+lut_colorslide_fuji_superia_200_xpro.cube|Superia 200 X-Pro|Fujifilm|Cross-process
+lut_fuji_superia400.cube|Superia 400|Fujifilm|Colour
+lut_negative_old_fuji_superia_800_pp.cube|Superia 800|Fujifilm|Colour
+lut_negative_color_fuji_superia_hg_1600.cube|Superia HG 1600|Fujifilm|Colour
+lut_negative_color_fuji_superia_reala_100.cube|Superia Reala 100|Fujifilm|Colour
+design:fuji_superia_xtra_400|Superia X-TRA 400|Fujifilm|Colour
+lut_negative_color_fuji_superia_x_mtra_800.cube|Superia X-TRA 800|Fujifilm|Colour
+lut_colorslide_fuji_velvia_100_generic.cube|Velvia 100|Fujifilm|Slide
+lut_colorslide_fuji_velvia_50.cube|Velvia 50|Fujifilm|Slide
+lut_fujixtransiii_fuji_xtrans_iii_acros.cube|X-Trans Acros|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_acros_pg.cube|X-Trans Acros + G|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_acros_pr.cube|X-Trans Acros + R|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_acros_pye.cube|X-Trans Acros + Ye|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_astia.cube|X-Trans Astia|Fujifilm|Colour
+lut_fujixtransiii_fuji_xtrans_iii_classic_chrome.cube|X-Trans Classic Chrome|Fujifilm|Colour
+lut_fujixtransiii_fuji_xtrans_iii_mono.cube|X-Trans Mono|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_mono_pg.cube|X-Trans Mono + G|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_mono_pr.cube|X-Trans Mono + R|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_mono_pye.cube|X-Trans Mono + Ye|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_pro_neg_hi.cube|X-Trans Pro Neg Hi|Fujifilm|Colour
+lut_fujixtransiii_fuji_xtrans_iii_pro_neg_std.cube|X-Trans Pro Neg Std|Fujifilm|Colour
+lut_fujixtransiii_fuji_xtrans_iii_provia.cube|X-Trans Provia|Fujifilm|Colour
+lut_fujixtransiii_fuji_xtrans_iii_sepia.cube|X-Trans Sepia|Fujifilm|Black & white
+lut_fujixtransiii_fuji_xtrans_iii_velvia.cube|X-Trans Velvia|Fujifilm|Colour
+design:cinestill_800t|CineStill 800T|Cine|Cine
+design:cinestill_800t_cool|CineStill 800T Cool|Cine|Cine
+design:cinestill_50d|CineStill 50D|Cine|Cine
+design:cinestill_400d|CineStill 400D|Cine|Cine
+design:cinestill_bwxx|CineStill BwXX|Cine|Cine
+design:vision3_50d|Kodak Vision3 50D|Cine|Cine
+design:vision3_250d|Kodak Vision3 250D|Cine|Cine
+design:vision3_200t|Kodak Vision3 200T|Cine|Cine
+design:vision3_500t|Kodak Vision3 500T|Cine|Cine
+design:eterna_250d|Fuji Eterna 250D|Cine|Cine
+design:eterna_bleach|Fuji Eterna Bleach Bypass|Cine|Cine
+design:teal_orange|Teal & Orange|Cine|Cine
+design:bleach_bypass|Bleach Bypass|Cine|Cine
+design:golden_hour|Golden Hour|Cine|Cine
+design:blue_hour|Blue Hour|Cine|Cine
+design:day_for_night|Day for Night|Cine|Cine
+design:neon_noir|Neon Noir|Cine|Cine
+design:technicolor|Technicolor|Cine|Cine
+design:faded_70s|70s Faded|Cine|Cine
+design:super8|Super 8|Cine|Cine
+design:matrix_green|Matrix Green|Cine|Cine
+design:pastel_symmetry|Pastel Symmetry|Cine|Cine
+design:desert|Desert|Cine|Cine
+lut_print_fuji_3510_constlmap.cube|Fuji 3510 Print|Cine|Cinema print
+lut_print_fuji_3513_constlmap.cube|Fuji 3513 Print|Cine|Cinema print
+lut_print_kodak_2383_constlmap.cube|Kodak 2383 Print|Cine|Cinema print
+lut_print_kodak_2393_constlmap.cube|Kodak 2393 Print|Cine|Cinema print

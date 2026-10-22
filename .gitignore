@@ -1,0 +1,7 @@
+# build output
+build/
+*.apk
+# signing keys stay local
+*.keystore
+# preview sheets rendered from personal photos
+previews/
