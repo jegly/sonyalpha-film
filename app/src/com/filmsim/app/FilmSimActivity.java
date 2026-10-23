@@ -88,10 +88,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private boolean overlay = true;
 
     // Fn menu: one row per setting
-    private static final String[] MENU_ROWS = {"Brand", "Film", "Strength", "WB", "Kelvin", "Halation", "Grain", "Light leak",
-            "Copy size"};
-    private static final int ROW_BRAND = 0, ROW_FILM = 1, ROW_STRENGTH = 2, ROW_WB = 3, ROW_KELVIN = 4, ROW_HALATION = 5,
-            ROW_GRAIN = 6, ROW_LEAK = 7, ROW_SIZE = 8;
+    private static final String[] MENU_ROWS = {"Brand", "Film", "Strength", "WB", "Kelvin", "D-Range", "Halation", "Grain",
+            "Light leak", "Copy size"};
+    private static final int ROW_BRAND = 0, ROW_FILM = 1, ROW_STRENGTH = 2, ROW_WB = 3, ROW_KELVIN = 4, ROW_DRO = 5,
+            ROW_HALATION = 6, ROW_GRAIN = 7, ROW_LEAK = 8, ROW_SIZE = 9;
     private static final String[] GRAIN_NAMES = {"Off", "Fine", "Medium", "Heavy", "Coarse"};
     private static final String FAVOURITES = "Favourites";
     private boolean menuOpen;
@@ -102,6 +102,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private int grain;
     private boolean lightLeak;
     private boolean largeCopy;
+    // Sony's D-Range Optimizer: 0 off, 1 auto, 2.. level 1..maxDro
+    private int dro;
+    private int maxDro = 5;
+    private List<String> droModes = new ArrayList<String>();
 
     // White balance panel
     private static final String[] WB_ORDER = {"auto", "daylight", "shade", "cloudy-daylight", "incandescent",
@@ -260,6 +264,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     /** Settings that have to be (re)applied every time the camera is opened. */
     private void startShooting() {
         if (savedWb != null) setWhiteBalance(savedWb, savedKelvin, false);
+        applyDro();
         applyModeDial();
         applyEvDial();
         applyLook();
@@ -536,6 +541,15 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 }
             }
             Collections.sort(magLevels);
+            try {
+                List modes = m.getSupportedDROModes();
+                droModes.clear();
+                if (modes != null) for (Object o : modes) droModes.add(o.toString());
+                maxDro = Math.max(1, m.getMaxDROLevel());
+                log("dro modes " + droModes + " max level " + maxDro);
+            } catch (Throwable t) {
+                log("dro capabilities failed: " + t);
+            }
             wbModes.clear();
             List<String> wb = sup.getSupportedWhiteBalance();
             for (String mode : WB_ORDER) {
@@ -736,6 +750,13 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             case ROW_KELVIN:
                 if (wbModes.contains(WB_KELVIN)) setWhiteBalance(WB_KELVIN, kelvin + dir * 100, true);
                 break;
+            case ROW_DRO:
+                if (!droModes.isEmpty()) {
+                    int count = maxDro + 2;
+                    dro = (dro + dir + count) % count;
+                    applyDro();
+                }
+                break;
             case ROW_HALATION:
                 halation = !halation;
                 developHint();
@@ -873,6 +894,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             strength + "%",
             wbModes.isEmpty() ? "n/a" : wbLabel(wbMode, kelvin),
             kelvin + "K" + (WB_KELVIN.equals(wbMode) ? "" : "  (sets WB)"),
+            droLabel(),
             halation ? "On" : "Off",
             GRAIN_NAMES[grain],
             lightLeak ? "On  (random each shot)" : "Off",
@@ -921,6 +943,31 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         }
         refreshExposureBar();
         refreshMenu();
+    }
+
+    private void applyDro() {
+        if (camera == null || droModes.isEmpty()) return;
+        try {
+            Camera.Parameters p = camera.createEmptyParameters();
+            CameraEx.ParametersModifier m = camera.createParametersModifier(p);
+            if (dro == 0) {
+                m.setDROMode(CameraEx.ParametersModifier.DRO_MODE_OFF);
+            } else if (dro == 1 && droModes.contains(CameraEx.ParametersModifier.DRO_MODE_AUTO)) {
+                m.setDROMode(CameraEx.ParametersModifier.DRO_MODE_AUTO);
+            } else {
+                m.setDROMode(CameraEx.ParametersModifier.DRO_MODE_ON);
+                m.setDROLevel(Math.max(1, Math.min(maxDro, dro - 1)));
+            }
+            camera.getNormalCamera().setParameters(p);
+        } catch (Throwable t) {
+            log("applyDro failed: " + t);
+            showMessage("D-Range failed: " + t);
+        }
+    }
+
+    private String droLabel() {
+        if (droModes.isEmpty()) return "n/a";
+        return dro == 0 ? "Off" : dro == 1 ? "Auto" : "Level " + (dro - 1) + "  (more highlight and shadow detail)";
     }
 
     private static String wbLabel(String mode, int k) {
@@ -1873,6 +1920,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         grain = Math.max(0, Math.min(GRAIN_NAMES.length - 1, prefs.getInt("grain", 0)));
         lightLeak = prefs.getBoolean("leak", false);
         largeCopy = prefs.getBoolean("largecopy", false);
+        dro = Math.max(0, prefs.getInt("dro", 0));
         favourites.clear();
         for (String key : prefs.getString("favourites", "").split("\n")) {
             if (key.length() > 0) favourites.add(key);
@@ -1891,6 +1939,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 .putInt("grain", grain)
                 .putBoolean("leak", lightLeak)
                 .putBoolean("largecopy", largeCopy)
+                .putInt("dro", dro)
                 .putString("favourites", joinLines(favourites))
                 .commit();
     }

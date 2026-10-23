@@ -145,6 +145,7 @@ Up and down pick a row, left and right (or the control wheel) change it. The loo
 | Strength | 0 to 100% in 5% steps |
 | WB | Auto, Daylight, Shade, Cloudy, Tungsten, fluorescent types, Flash, Kelvin |
 | Kelvin | 100K steps, switches WB to Kelvin |
+| D-Range | Sony's D-Range Optimizer: Off, Auto or levels 1 to 5. Keeps more highlight and shadow detail, in photos and video |
 | Halation | Off or On |
 | Grain | Off, Fine, Medium, Heavy or Coarse |
 | Light leak | Off or On |
@@ -155,6 +156,7 @@ Press Fn, centre or MENU to close it. Half pressing the shutter closes it too.
 ## Good to know
 
 - **Shoot RAW + JPEG.** The look is applied when the camera processes the image. RAW files store the sensor data before that, so on a computer they open without the look. The JPEG has it.
+- Picture Profiles (including S-Log2) don't apply inside Film Sim. Apps always get the camera's normal picture, so leave PP off. Use the D-Range row if you want more highlight and shadow detail.
 - Using a manual lens? Keep **Release w/o Lens** turned on in the camera menu, and set the stabiliser focal length before you open the app.
 - The app waits for each photo and video to finish saving before it lets you leave or open playback, so files can't get cut off.
 
