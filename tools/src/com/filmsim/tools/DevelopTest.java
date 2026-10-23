@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 /**
  * Runs the camera's develop step on a computer: same strip processing and JPEG encoder.
  * Usage: DevelopTest <in.jpg> <out.jpg> <scale> <effects...> where effects are any of
- * halation, grain1, grain2, grain3, leak, mono, seed=N
+ * halation, grain1, grain2, grain3, grain4, leak, mono, seed=N
  */
 public class DevelopTest {
     public static void main(String[] args) throws IOException {

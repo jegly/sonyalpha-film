@@ -49,7 +49,7 @@ public class Develop {
         boolean proceed();
     }
 
-    /** What to add. Grain levels: 0 off, 1 fine, 2 medium, 3 heavy. */
+    /** What to add. Grain levels: 0 off, 1 fine, 2 medium, 3 heavy, 4 coarse (big clumps). */
     public static class Options {
         public boolean halation;
         public int grain;
@@ -75,8 +75,8 @@ public class Develop {
     private static final float[] HALO_TINT = {1.0f, 0.18f, 0.06f};
 
     // Grain: peak strength in levels (0-255) and clump size in pixels at 3000 px wide, per level.
-    private static final float[] GRAIN_STRENGTH = {0, 7f, 11f, 17f};
-    private static final float[] GRAIN_CLUMP = {1, 1.1f, 1.6f, 2.3f};
+    private static final float[] GRAIN_STRENGTH = {0, 7f, 11f, 17f, 18f};
+    private static final float[] GRAIN_CLUMP = {1, 1.1f, 1.6f, 2.3f, 3.6f};
 
     private static final int LEAK_GRID = 8;    // light leak worked out every 8 px, then stretched
     private static final int GRAIN_TILE = 512; // grain texture size, tiled across the photo

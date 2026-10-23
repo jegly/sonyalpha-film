@@ -92,7 +92,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             "Copy size"};
     private static final int ROW_BRAND = 0, ROW_FILM = 1, ROW_STRENGTH = 2, ROW_WB = 3, ROW_KELVIN = 4, ROW_HALATION = 5,
             ROW_GRAIN = 6, ROW_LEAK = 7, ROW_SIZE = 8;
-    private static final String[] GRAIN_NAMES = {"Off", "Fine", "Medium", "Heavy"};
+    private static final String[] GRAIN_NAMES = {"Off", "Fine", "Medium", "Heavy", "Coarse"};
     private static final String FAVOURITES = "Favourites";
     private boolean menuOpen;
     private int menuRow = ROW_FILM;
