@@ -4,6 +4,8 @@ import android.content.res.AssetManager;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -18,13 +20,20 @@ public class FilmLibrary {
         public final String type;
         /** Mean error (0-255) between the original LUT and what the camera can reproduce. */
         public final float error;
+        /** Set for the user's own LUTs: the converted look on the card, instead of an app asset. */
+        public final File external;
 
         Film(String file, String name, String brand, String type, float error) {
+            this(file, name, brand, type, error, null);
+        }
+
+        Film(String file, String name, String brand, String type, float error, File external) {
             this.file = file;
             this.name = name;
             this.brand = brand;
             this.type = type;
             this.error = error;
+            this.external = external;
         }
 
         /** Designed directly in the camera's model, so it reproduces exactly (error stored as -1). */
@@ -85,8 +94,20 @@ public class FilmLibrary {
         return null;
     }
 
+    /** Puts the user's LUTs in their own brand at the front of the list (replacing any from before). */
+    public void setCustom(List<Film> custom) {
+        for (int i = films.size() - 1; i >= 0; i--) {
+            if (CustomLuts.BRAND.equals(films.get(i).brand)) films.remove(i);
+        }
+        brands.remove(CustomLuts.BRAND);
+        if (custom.isEmpty()) return;
+        films.addAll(0, custom);
+        brands.add(0, CustomLuts.BRAND);
+    }
+
     public static Look load(AssetManager assets, Film film) throws IOException {
-        DataInputStream in = new DataInputStream(assets.open("films/" + film.file));
+        DataInputStream in = new DataInputStream(film.external != null
+                ? new FileInputStream(film.external) : assets.open("films/" + film.file));
         try {
             if (in.readInt() != 1) throw new IOException("bad film file " + film.file);
             Look look = new Look();

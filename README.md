@@ -15,6 +15,7 @@ You choose a film, the screen shows it in real time, and your JPEGs and videos c
 - The look is saved into your JPEGs and videos
 - Strength control from 0 to 100% for every look
 - Favourites, so the films you use most are at the top
+- Load your own `.cube` LUTs from the SD card
 - Optional halation, film grain and light leaks, added to a copy of each JPEG after you shoot
 - Full manual exposure: shutter speed, ISO (including Auto), exposure compensation and the mode dial (P, A, S, M)
 - White balance presets and Kelvin in 100K steps
@@ -37,6 +38,18 @@ The catch is that a curve plus a matrix can't copy every film LUT perfectly. Eac
 - ★☆☆ a rough version of the look
 
 Effects that spread light around, like the red halation glow around lights on CineStill 800T, or grain, can't be done live. You still get the colour and contrast of those films live, and the app can add those effects afterwards (see below).
+
+## Your own LUTs
+
+You can add any `.cube` LUT: ones you've bought, downloaded or exported from an editing app.
+
+1. Make a folder called `LUTS` at the top of the SD card.
+2. Copy your `.cube` files into it. 17, 33 and 65 point LUTs all work.
+3. Open Film Sim. New LUTs are converted the first time, which takes a few seconds each, and then show up in a **My LUTs** brand at the start of the list with the usual accuracy stars.
+
+Use the Rec.709 (normal colour) versions of a LUT pack, not the log ones. The camera hands the app normal colour, so LUTs made for S-Log or other log footage come out dark and contrasty. If a LUT can't be read the app tells you once and skips it.
+
+Your LUTs stay on your card and are never part of the app, so this is the way to use paid or licensed LUT packs.
 
 ## Halation, grain and light leaks
 
@@ -127,7 +140,7 @@ Up and down pick a row, left and right (or the control wheel) change it. The loo
 
 | Row | What it changes |
 |---|---|
-| Brand | Favourites, Polaroid, Ilford, Kodak, Fujifilm, Cine |
+| Brand | Favourites, My LUTs, Polaroid, Ilford, Kodak, Fujifilm, Cine |
 | Film | The film within that brand. Delete turns the film off |
 | Strength | 0 to 100% in 5% steps |
 | WB | Auto, Daylight, Shade, Cloudy, Tungsten, fluorescent types, Flash, Kelvin |

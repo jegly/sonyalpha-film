@@ -162,6 +162,9 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     /** Newest files before the next shot. The camera's clock can't be trusted (it reads 1970), so new files are
      * the ones that weren't there before. */
     private File knownPhoto, knownJpeg;
+    /** The saved film when it's one of the user's LUTs, which only exist once they've been loaded. */
+    private String pendingFilmKey;
+    private Thread customLoader;
     private long exitConfirmUntil;
 
     private FileWriter log;
@@ -235,6 +238,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         if (!openCamera()) return;
         readCapabilities();
         startShooting();
+        loadCustomLuts();
     }
 
     @Override
@@ -750,6 +754,50 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 break;
         }
         refreshMenu();
+    }
+
+    /** Reads the user's own LUTs from the LUTS folder, converting new ones in the background. */
+    private void loadCustomLuts() {
+        if (customLoader != null && customLoader.isAlive()) return;
+        final File card = Environment.getExternalStorageDirectory();
+        customLoader = new Thread(new Runnable() {
+            public void run() {
+                android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+                final List<FilmLibrary.Film> custom = new CustomLuts(card).load(new CustomLuts.Listener() {
+                    public void onConverting(final int index, final int total, final String name) {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                showMessage("Converting your LUT " + index + "/" + total + ": " + name);
+                            }
+                        });
+                    }
+
+                    public void onFailed(final String name, final String reason) {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                log("custom LUT " + name + " failed: " + reason);
+                                showMessage("Couldn't use LUT " + name + ": " + reason);
+                            }
+                        });
+                    }
+                });
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (pausing) return;
+                        library.setCustom(custom);
+                        if (!custom.isEmpty()) log("loaded " + custom.size() + " custom LUTs");
+                        if (pendingFilmKey != null) {
+                            FilmLibrary.Film f = library.find(pendingFilmKey);
+                            pendingFilmKey = null;
+                            if (f != null) selectFilm(f);
+                        }
+                        refreshMenu();
+                        refreshFilmBar();
+                    }
+                });
+            }
+        }, "custom-luts");
+        customLoader.start();
     }
 
     private boolean developOn() {
@@ -1815,7 +1863,9 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         SharedPreferences prefs = getSharedPreferences("filmsim", MODE_PRIVATE);
         strength = prefs.getInt("strength", 100);
         overlay = prefs.getBoolean("overlay", true);
-        film = library == null ? null : library.find(prefs.getString("film", ""));
+        String filmKey = prefs.getString("film", "");
+        film = library == null ? null : library.find(filmKey);
+        pendingFilmKey = film == null && filmKey.startsWith("custom:") ? filmKey : null;
         look = null;
         bypass = false;
         savedWb = prefs.getString("wb", null);
