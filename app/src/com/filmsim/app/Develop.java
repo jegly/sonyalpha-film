@@ -69,8 +69,8 @@ public class Develop {
     private static final int STRIP = 64; // output rows per pass, multiple of 16 for the encoder
 
     // Halation: a warm glow hugging the light, and a wide deep red halo around it.
-    private static final int THRESHOLD = 200;
-    private static final float CORE_STRENGTH = 1.6f, HALO_STRENGTH = 2.6f;
+    private static final int THRESHOLD = 215;
+    private static final float CORE_STRENGTH = 1.4f, HALO_STRENGTH = 2.2f;
     private static final float[] CORE_TINT = {1.0f, 0.5f, 0.22f};
     private static final float[] HALO_TINT = {1.0f, 0.18f, 0.06f};
 
@@ -101,10 +101,15 @@ public class Develop {
         if (opt.halation) {
             small = src.preview(4);
             core = highlights(small);
+            float[] core0 = core.clone();
             blur(core, small.w, small.h, Math.max(1, Math.round(small.w * 0.004f)));
             tiny = shrink(small, 4);
             halo = highlights(tiny);
+            float[] halo0 = halo.clone();
             blur(halo, tiny.w, tiny.h, Math.max(1, Math.round(tiny.w * 0.025f)));
+            // glow only spills outward: a big bright area (a window) gets a red edge, not a wash over everything
+            for (int i = 0; i < core.length; i++) core[i] = Math.max(0, core[i] - core0[i] * 0.9f);
+            for (int i = 0; i < halo.length; i++) halo[i] = Math.max(0, halo[i] - halo0[i] * 0.9f);
         }
         if (gate != null && !gate.proceed()) throw new IOException("cancelled");
 
@@ -132,7 +137,7 @@ public class Develop {
             by[i] = vertical ? across : pos;
             sx[i] = vertical ? sAlong : sAcross;
             sy[i] = vertical ? sAcross : sAlong;
-            amp[i] = i == 0 ? 0.85f + rnd.nextFloat() * 0.2f : 0.5f + rnd.nextFloat() * 0.4f;
+            amp[i] = i == 0 ? 0.42f + rnd.nextFloat() * 0.16f : 0.22f + rnd.nextFloat() * 0.18f;
             col[i] = rgb(LEAK_COLOURS[rnd.nextInt(10) == 0 ? 3 : rnd.nextInt(3)]);
         }
         float leakNoise = w * 0.14f;
@@ -271,14 +276,12 @@ public class Develop {
                         if (lr > 0.002f) {
                             float lg = leakRowG[i0] + (leakRowG[i0 + 1] - leakRowG[i0]) * t;
                             float lb = leakRowB[i0] + (leakRowB[i0 + 1] - leakRowB[i0]) * t;
-                            // a hot core burns towards yellow-white
-                            float hot = lr > 0.75f ? lr - 0.75f : 0;
                             R = screen(R, lr);
-                            G = screen(G, lg + hot * 0.55f);
-                            B = screen(B, lb + hot * 0.25f);
-                            // fogged film loses its own colour under the leak: pull towards the leak's hue
-                            float pull = Math.min(0.55f, lr * 0.5f);
-                            float tr = 255, tg = 255 * Math.min(1, lg / lr + hot * 0.6f), tb = 255 * Math.min(1, lb / lr + hot * 0.3f);
+                            G = screen(G, lg);
+                            B = screen(B, lb);
+                            // a light pull towards the leak's hue so it still reads over bright areas
+                            float pull = Math.min(0.18f, lr * 0.3f);
+                            float tr = 255, tg = 255 * lg / lr, tb = 255 * lb / lr;
                             R += (tr - R) * pull;
                             G += (tg - G) * pull;
                             B += (tb - B) * pull;

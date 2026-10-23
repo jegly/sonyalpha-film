@@ -31,6 +31,7 @@ import com.sony.scalar.media.MediaRecorder;
 import com.sony.scalar.provider.AvindexStore;
 import com.sony.scalar.sysutil.KeyStatus;
 import com.sony.scalar.sysutil.ScalarInput;
+import com.sony.scalar.sysutil.didep.Gpelibrary;
 import com.sony.scalar.widget.OptimizedImageView;
 
 import java.io.BufferedReader;
@@ -143,6 +144,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private ImageView devView;
     private Bitmap devBitmap;
     private boolean showDeveloped = true;
+    /** The developed copy decoded by Sony's viewer, which shows full colour (the app's overlay is 16 levels per colour). */
+    private OptimizedImage devImage;
 
     // Video: the camera is reopened in movie mode for recording, then back in photo mode afterwards.
     private MediaRecorder recorder;
@@ -1213,6 +1216,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         surfaceView.setVisibility(View.GONE);
         filmBar.setVisibility(View.GONE);
         exposureBar.setVisibility(View.GONE);
+        setOverlayColour(true);
         playView = new OptimizedImageView(this);
         // just above the live view surface, below the info line
         root.addView(playView, 1, new RelativeLayout.LayoutParams(
@@ -1244,6 +1248,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             devView = null;
         }
         releaseDevBitmap();
+        releaseDevImage();
+        setOverlayColour(false);
         if (playView != null) {
             root.removeView(playView);
             try {
@@ -1256,6 +1262,25 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         playInfo.setVisibility(View.GONE);
         surfaceView.setVisibility(View.VISIBLE);
         if (reopen && openCamera()) startShooting();
+    }
+
+    private void releaseDevImage() {
+        if (devImage != null) {
+            try {
+                devImage.release();
+            } catch (Throwable ignored) {
+            }
+            devImage = null;
+        }
+    }
+
+    /** Full colour (8 bits per channel) or the camera's usual 4-bit overlay. */
+    private void setOverlayColour(boolean full) {
+        try {
+            Gpelibrary.changeFrameBufferPixel(full ? Gpelibrary.GS_FRAMEBUFFER_TYPE.ABGR8888 : Gpelibrary.GS_FRAMEBUFFER_TYPE.RGBA4444);
+        } catch (Throwable t) {
+            log("overlay colour change failed: " + t);
+        }
     }
 
     private void releaseDevBitmap() {
@@ -1361,18 +1386,51 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             releaseDevBitmap();
             devView.setVisibility(View.GONE);
         }
-        boolean devShown = hasDev && showDeveloped && showDevCopy(dev, orientation);
-        // Sony's viewer draws on its own display layer, which can sit above the app's views, so hide it
-        // while the developed copy is on screen
-        playView.setVisibility(devShown ? View.INVISIBLE : View.VISIBLE);
-        if (!devShown && img != null) {
+        boolean devShown = false;
+        String via = "";
+        releaseDevImage();
+        if (hasDev && showDeveloped) {
+            // Sony's viewer shows full colour; try it first
             try {
-                playView.setOptimizedImage(img);
+                OptimizedImageFactory.Options o = new OptimizedImageFactory.Options();
+                o.imageType = 3;
+                devImage = OptimizedImageFactory.decodeImage(dev.getAbsolutePath(), o);
             } catch (Throwable t) {
-                log("re-show original failed: " + t);
+                log("viewer decode of copy failed: " + t);
+                devImage = null;
+            }
+            if (devImage != null) {
+                devView.setImageBitmap(null);
+                releaseDevBitmap();
+                devView.setVisibility(View.GONE);
+                playView.setVisibility(View.VISIBLE);
+                try {
+                    playView.setOptimizedImage(devImage);
+                    devShown = true;
+                    via = "viewer";
+                } catch (Throwable t) {
+                    log("viewer show of copy failed: " + t);
+                    releaseDevImage();
+                }
+            }
+            if (!devShown && showDevCopy(dev, orientation)) {
+                // Sony's viewer draws on its own layer above the app's views, so hide it under the overlay copy
+                playView.setVisibility(View.INVISIBLE);
+                devShown = true;
+                via = "overlay";
             }
         }
-        log("playback " + name + " | copy " + dev.getName() + " exists " + hasDev + " shown " + devShown);
+        if (!devShown) {
+            playView.setVisibility(View.VISIBLE);
+            if (img != null) {
+                try {
+                    playView.setOptimizedImage(img);
+                } catch (Throwable t) {
+                    log("re-show original failed: " + t);
+                }
+            }
+        }
+        log("playback " + name + " | copy " + dev.getName() + " exists " + hasDev + " shown " + devShown + " " + via);
         String devLabel = !hasDev ? "" : devShown ? "DEVELOPED (C1: original)   " : "ORIGINAL (C1: developed)   ";
         playInfo.setText(devLabel + name + "   " + (filmUsed != null ? filmUsed + "   " : "") + info
                 + (playIndex + 1) + "/" + playFiles.size() + "      < > browse   Play: back");
