@@ -87,9 +87,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private boolean overlay = true;
 
     // Fn menu: one row per setting
-    private static final String[] MENU_ROWS = {"Brand", "Film", "Strength", "WB", "Kelvin", "Halation", "Grain", "Light leak"};
+    private static final String[] MENU_ROWS = {"Brand", "Film", "Strength", "WB", "Kelvin", "Halation", "Grain", "Light leak",
+            "Copy size"};
     private static final int ROW_BRAND = 0, ROW_FILM = 1, ROW_STRENGTH = 2, ROW_WB = 3, ROW_KELVIN = 4, ROW_HALATION = 5,
-            ROW_GRAIN = 6, ROW_LEAK = 7;
+            ROW_GRAIN = 6, ROW_LEAK = 7, ROW_SIZE = 8;
     private static final String[] GRAIN_NAMES = {"Off", "Fine", "Medium", "Heavy"};
     private static final String FAVOURITES = "Favourites";
     private boolean menuOpen;
@@ -99,6 +100,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     private boolean halation;
     private int grain;
     private boolean lightLeak;
+    private boolean largeCopy;
 
     // White balance panel
     private static final String[] WB_ORDER = {"auto", "daylight", "shade", "cloudy-daylight", "incandescent",
@@ -739,6 +741,10 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 lightLeak = !lightLeak;
                 developHint();
                 break;
+            case ROW_SIZE:
+                largeCopy = !largeCopy;
+                showMessage(largeCopy ? "Large copies: 3000 px wide, slow (1-2 min each)" : "Small copies: 1500 px wide, much faster");
+                break;
         }
         refreshMenu();
     }
@@ -819,6 +825,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             halation ? "On" : "Off",
             GRAIN_NAMES[grain],
             lightLeak ? "On  (random each shot)" : "Off",
+            largeCopy ? "Large  (3000 px, slow)" : "Small  (1500 px, fast)",
         };
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < MENU_ROWS.length; i++) {
@@ -1133,6 +1140,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 opt.halation = halation;
                 opt.grain = grain;
                 opt.lightLeak = lightLeak;
+                opt.sample = largeCopy ? 2 : 4;
                 opt.monochrome = shotFilm != null && "Black & white".equals(shotFilm.type);
                 opt.seed = jpeg.getName().hashCode() * 31L + shotTime;
                 developer.add(jpeg, opt);
@@ -1311,6 +1319,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         OptimizedImage img = null;
         String info = "";
         int orientation = 1;
+        String name = null;
         try {
             OptimizedImageFactory.Options o = new OptimizedImageFactory.Options();
             o.imageType = 3;
@@ -1324,6 +1333,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 if (t > 0) info += (t < 1 ? "1/" + Math.round(1 / t) : String.format("%.1f\"", t)) + "   ";
                 if (iso > 0) info += "ISO " + iso + "   ";
                 orientation = ci.getAttributeInt(AvindexContentInfo.TAG_ORIENTATION, 1);
+                // playback hands out avindex:// ids; the file name comes from the photo's info
+                name = ci.getAttribute(AvindexContentInfo.TAG_DCF_TBL_FILE_NAME);
             }
             playView.setDisplayType(OptimizedImageView.DisplayType.DISPLAY_TYPE_CENTER_INNER);
             playView.setOptimizedImage(img);
@@ -1332,7 +1343,15 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         }
         releasePlayImage();
         playImage = img;
-        String name = new File(data).getName();
+        if (name == null || name.length() == 0) {
+            try {
+                AvindexContentInfo full = AvindexStore.Images.Media.getImageInfo(data);
+                if (full != null) name = full.getAttribute(AvindexContentInfo.TAG_DCF_TBL_FILE_NAME);
+            } catch (Throwable t) {
+                log("file name lookup failed: " + t);
+            }
+        }
+        if (name == null || name.length() == 0) name = new File(data).getName();
         String filmUsed = shotFilms.get(name.toUpperCase());
         File dev = new File(new File(new File(Environment.getExternalStorageDirectory(), "FILMSIM"), "DEV"),
                 Developer.outName(name) + ".JPG");
@@ -1353,7 +1372,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 log("re-show original failed: " + t);
             }
         }
-        log("playback " + data + " | copy " + dev.getPath() + " exists " + hasDev + " shown " + devShown);
+        log("playback " + name + " | copy " + dev.getName() + " exists " + hasDev + " shown " + devShown);
         String devLabel = !hasDev ? "" : devShown ? "DEVELOPED (C1: original)   " : "ORIGINAL (C1: developed)   ";
         playInfo.setText(devLabel + name + "   " + (filmUsed != null ? filmUsed + "   " : "") + info
                 + (playIndex + 1) + "/" + playFiles.size() + "      < > browse   Play: back");
@@ -1745,6 +1764,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         halation = prefs.getBoolean("halation", false);
         grain = Math.max(0, Math.min(GRAIN_NAMES.length - 1, prefs.getInt("grain", 0)));
         lightLeak = prefs.getBoolean("leak", false);
+        largeCopy = prefs.getBoolean("largecopy", false);
         favourites.clear();
         for (String key : prefs.getString("favourites", "").split("\n")) {
             if (key.length() > 0) favourites.add(key);
@@ -1762,6 +1782,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 .putBoolean("halation", halation)
                 .putInt("grain", grain)
                 .putBoolean("leak", lightLeak)
+                .putBoolean("largecopy", largeCopy)
                 .putString("favourites", joinLines(favourites))
                 .commit();
     }

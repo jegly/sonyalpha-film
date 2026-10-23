@@ -58,7 +58,9 @@ public class DevelopTest {
         long t0 = System.currentTimeMillis();
         OutputStream os = new BufferedOutputStream(new FileOutputStream(args[1]));
         try {
-            new Develop(opt).process(src, new Develop.JpegWriter(os, img.getWidth(), img.getHeight(), 92, exif), null);
+            Develop dev = new Develop(opt);
+            dev.process(src, new Develop.JpegWriter(os, img.getWidth(), img.getHeight(), 92, exif), null);
+            System.out.println("  " + dev.timing);
         } finally {
             os.close();
         }

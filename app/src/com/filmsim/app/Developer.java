@@ -15,8 +15,8 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 
 /**
- * Background queue that makes developed copies (halation, grain, light leaks) of JPEGs at half size in
- * FILMSIM/DEV.
+ * Background queue that makes developed copies (halation, grain, light leaks) of JPEGs in FILMSIM/DEV, at
+ * a half (Large) or quarter (Small) of the photo's width and height.
  * Each copy is written to a .TMP file and renamed when complete, so a cut-off run never leaves a broken JPEG.
  */
 public class Developer {
@@ -31,7 +31,6 @@ public class Developer {
         void onFailed(String source, Throwable error);
     }
 
-    private static final int SAMPLE = 2; // copies are half the photo's width and height
     private static final long MB = 1024 * 1024;
 
     private final File outDir;
@@ -160,35 +159,57 @@ public class Developer {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(src.getPath(), bounds);
-        long bytes = (long) (bounds.outWidth / SAMPLE) * (bounds.outHeight / SAMPLE) * 4;
+        final int sample = opt.sample;
+        long bytes = (long) (bounds.outWidth / sample) * (bounds.outHeight / sample) * 4;
         Runtime rt = Runtime.getRuntime();
         long free = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory());
         String mem = "heap " + rt.maxMemory() / MB + " MB, free " + free / MB + " MB";
-        if (bounds.outWidth <= 0 || free < bytes * 3 / 2 + 12 * MB) {
+        // room for the decoded bitmap, an editable copy of it, and a little headroom
+        if (bounds.outWidth <= 0 || free < bytes * 2 + 4 * MB) {
             memNote = mem + ", streaming";
             return null;
         }
         long t0 = System.currentTimeMillis();
         BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inSampleSize = SAMPLE;
+        o.inSampleSize = sample;
+        Bitmap decoded = null;
+        BitmapRegionDecoder region = null;
         try {
-            // inMutable is API 11; set it by name since the app is built against API 10
-            BitmapFactory.Options.class.getField("inMutable").setBoolean(o, true);
-        } catch (Exception e) {
-            memNote = mem + ", no mutable bitmaps, streaming";
+            // the region decoder is noticeably quicker than decodeFile on the camera
+            region = BitmapRegionDecoder.newInstance(src.getPath(), false);
+            if (region != null) decoded = region.decodeRegion(new Rect(0, 0, region.getWidth(), region.getHeight()), o);
+        } catch (OutOfMemoryError e) {
+            decoded = null;
+        } finally {
+            if (region != null) region.recycle();
+        }
+        if (decoded == null) {
+            try {
+                decoded = BitmapFactory.decodeFile(src.getPath(), o);
+            } catch (OutOfMemoryError e) {
+                decoded = null;
+            }
+        }
+        if (decoded == null) {
+            memNote = mem + ", decode failed, streaming";
             return null;
         }
         final Bitmap full;
-        try {
-            full = BitmapFactory.decodeFile(src.getPath(), o);
-        } catch (OutOfMemoryError e) {
-            memNote = mem + ", out of memory decoding, streaming";
-            return null;
-        }
-        if (full == null || !full.isMutable()) {
-            if (full != null) full.recycle();
-            memNote = mem + ", streaming";
-            return null;
+        if (decoded.isMutable()) {
+            full = decoded;
+        } else {
+            Bitmap copy = null;
+            try {
+                copy = decoded.copy(Bitmap.Config.ARGB_8888, true);
+            } catch (OutOfMemoryError e) {
+                copy = null;
+            }
+            decoded.recycle();
+            if (copy == null) {
+                memNote = mem + ", no room for an editable copy, streaming";
+                return null;
+            }
+            full = copy;
         }
         memNote = mem + ", native";
         long t1 = System.currentTimeMillis();
@@ -251,7 +272,8 @@ public class Developer {
         if (decoder == null) throw new IOException("cannot decode " + src.getName());
         final String path = src.getPath();
         final int fullW = decoder.getWidth(), fullH = decoder.getHeight();
-        final int w = fullW / SAMPLE, h = fullH / SAMPLE;
+        final int sample = opt.sample;
+        final int w = fullW / sample, h = fullH / sample;
         Develop.Source source = new Develop.Source() {
             public int width() {
                 return w;
@@ -262,9 +284,11 @@ public class Developer {
             }
 
             public Develop.Image preview(int factor) throws IOException {
+                // the region decoder is already set up and is quicker than decoding the file again
                 BitmapFactory.Options o = new BitmapFactory.Options();
-                o.inSampleSize = SAMPLE * factor;
-                Bitmap b = BitmapFactory.decodeFile(path, o);
+                o.inSampleSize = sample * factor;
+                Bitmap b = decoder.decodeRegion(new Rect(0, 0, fullW, fullH), o);
+                if (b == null) b = BitmapFactory.decodeFile(path, o);
                 if (b == null) throw new IOException("preview decode failed");
                 int[] px = new int[b.getWidth() * b.getHeight()];
                 b.getPixels(px, 0, b.getWidth(), 0, 0, b.getWidth(), b.getHeight());
@@ -275,8 +299,8 @@ public class Developer {
 
             public void read(int y, int count, int[] rgb) throws IOException {
                 BitmapFactory.Options o = new BitmapFactory.Options();
-                o.inSampleSize = SAMPLE;
-                Rect r = new Rect(0, y * SAMPLE, fullW, Math.min(fullH, (y + count) * SAMPLE));
+                o.inSampleSize = sample;
+                Rect r = new Rect(0, y * sample, fullW, Math.min(fullH, (y + count) * sample));
                 Bitmap b = decoder.decodeRegion(r, o);
                 if (b == null) throw new IOException("region decode failed at row " + y);
                 int bw = Math.min(w, b.getWidth()), bh = Math.min(count, b.getHeight());

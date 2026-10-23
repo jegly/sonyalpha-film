@@ -54,6 +54,8 @@ public class Develop {
         public boolean halation;
         public int grain;
         public boolean lightLeak;
+        /** Copy size as a fraction of the photo: 2 = half (Large), 4 = quarter (Small). */
+        public int sample = 4;
         /** Black and white film: grain without colour. */
         public boolean monochrome;
         /** Varies grain and leaks between photos; use something unique per photo. */
@@ -202,6 +204,20 @@ public class Develop {
         float sxc = small == null ? 0 : small.w / (float) w, syc = small == null ? 0 : small.h / (float) h;
         float sxh = tiny == null ? 0 : tiny.w / (float) w, syh = tiny == null ? 0 : tiny.h / (float) h;
         int tileMask = GRAIN_TILE - 1;
+        // whole-number copies for the fast path: tile values x16, weights x256
+        int[] grainWeightI = new int[256];
+        for (int i = 0; i < 256; i++) grainWeightI[i] = Math.round(grainWeight[i] * 256);
+        int[] tileLi = null, tileRi = null, tileBi = null;
+        if (tileL != null) {
+            tileLi = new int[tileL.length];
+            tileRi = new int[tileL.length];
+            tileBi = new int[tileL.length];
+            for (int i = 0; i < tileL.length; i++) {
+                tileLi[i] = Math.round(tileL[i] * 16);
+                tileRi[i] = Math.round(tileR[i] * 16);
+                tileBi[i] = Math.round(tileB[i] * 16);
+            }
+        }
 
         long tRead = 0, tFx = 0, tEnc = 0, tPrep = System.nanoTime() - startNs;
         for (int y0 = 0; y0 < h; y0 += STRIP) {
@@ -218,6 +234,10 @@ public class Develop {
                         && rowAt(core, small.w, small.h, (y + 0.5f) * syc - 0.5f, coreRow) + rowAt(halo, tiny.w, tiny.h, (y + 0.5f) * syh - 0.5f, haloRow) > 0.002f;
                 boolean doLeak = opt.lightLeak && rowAt3(leakR, leakG, leakB, lw, lh, y / (float) LEAK_GRID, leakRowR, leakRowG, leakRowB) > 0.002f;
                 int tileRow = ((y + tileY) & tileMask) * GRAIN_TILE;
+                if (!doHalation && !doLeak) {
+                    if (opt.grain > 0) grainRow(band, base, w, tileRow, tileX, tileMask, tileLi, tileRi, tileBi, grainWeightI, opt.monochrome);
+                    continue;
+                }
                 for (int x = 0; x < w; x++) {
                     int px = band[base + x];
                     float R = (px >> 16) & 255, G = (px >> 8) & 255, B = px & 255;
@@ -294,6 +314,32 @@ public class Develop {
         out.finish();
         timing = "prep " + tPrep / 1000000 + " ms, read " + tRead / 1000000 + " ms, effects " + tFx / 1000000
                 + " ms, encode " + tEnc / 1000000 + " ms";
+    }
+
+    /** Grain on a row with no glow or leak, in whole numbers. */
+    private static void grainRow(int[] band, int base, int w, int tileRow, int tileX, int tileMask, int[] tl, int[] tr, int[] tb,
+            int[] weight, boolean mono) {
+        for (int x = 0; x < w; x++) {
+            int px = band[base + x];
+            int r = (px >> 16) & 255, g = (px >> 8) & 255, b = px & 255;
+            int wt = weight[(r * 77 + g * 150 + b * 29) >> 8];
+            int k = tileRow + ((x + tileX) & tileMask);
+            int d = (tl[k] * wt) >> 12;
+            if (mono) {
+                r += d;
+                g += d;
+                b += d;
+            } else {
+                int cr = (tr[k] * wt) >> 12, cb = (tb[k] * wt) >> 12;
+                r += d + cr;
+                g += d - ((cr + cb) >> 1);
+                b += d + cb;
+            }
+            r = r < 0 ? 0 : r > 255 ? 255 : r;
+            g = g < 0 ? 0 : g > 255 ? 255 : g;
+            b = b < 0 ? 0 : b > 255 ? 255 : b;
+            band[base + x] = (r << 16) | (g << 8) | b;
+        }
     }
 
     /** Box-averages an image down by `f`. */
@@ -628,10 +674,10 @@ public class Develop {
                 for (int x = 0; x < fullW; x++) {
                     int px = rgb[sr * width + Math.min(x, width - 1)];
                     int R = (px >> 16) & 255, G = (px >> 8) & 255, B = px & 255;
-                    y16[r * fullW + x] = 0.299f * R + 0.587f * G + 0.114f * B - 128;
+                    y16[r * fullW + x] = ((19595 * R + 38470 * G + 7471 * B) >> 16) - 128;
                     int ci = (r >> 1) * (mcuW * 8) + (x >> 1);
-                    cb8[ci] += (-0.168736f * R - 0.331264f * G + 0.5f * B) * 0.25f;
-                    cr8[ci] += (0.5f * R - 0.418688f * G - 0.081312f * B) * 0.25f;
+                    cb8[ci] += ((-11059 * R - 21709 * G + 32768 * B) >> 16) * 0.25f;
+                    cr8[ci] += ((32768 * R - 27439 * G - 5329 * B) >> 16) * 0.25f;
                 }
             }
         }
@@ -725,22 +771,36 @@ public class Develop {
             bits(code[0], code[1]);
         }
 
-        private void bits(int value, int len) throws IOException {
-            for (int i = len - 1; i >= 0; i--) {
-                bitBuf = (bitBuf << 1) | ((value >> i) & 1);
-                if (++bitCount == 8) {
-                    out.write(bitBuf);
-                    if (bitBuf == 0xFF) out.write(0);
-                    bitBuf = 0;
-                    bitCount = 0;
-                }
+        private final byte[] obuf = new byte[64 * 1024];
+        private int opos;
+
+        private void put(int b) throws IOException {
+            if (opos == obuf.length) {
+                out.write(obuf, 0, opos);
+                opos = 0;
             }
+            obuf[opos++] = (byte) b;
+        }
+
+        /** Appends `len` (at most 16) bits, writing whole bytes as they fill. */
+        private void bits(int value, int len) throws IOException {
+            bitBuf = (bitBuf << len) | (value & ((1 << len) - 1));
+            bitCount += len;
+            while (bitCount >= 8) {
+                int b = (bitBuf >> (bitCount - 8)) & 0xFF;
+                put(b);
+                if (b == 0xFF) put(0);
+                bitCount -= 8;
+            }
+            bitBuf &= (1 << bitCount) - 1;
         }
 
         public void finish() throws IOException {
             if (bitCount > 0) bits((1 << (8 - bitCount)) - 1, 8 - bitCount);
-            out.write(0xFF);
-            out.write(0xD9);
+            put(0xFF);
+            put(0xD9);
+            out.write(obuf, 0, opos);
+            opos = 0;
             out.flush();
         }
     }

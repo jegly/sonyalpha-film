@@ -46,7 +46,7 @@ Turn these on in the Fn menu and the app makes a developed copy of each JPEG in 
 - **Grain** comes in Fine, Medium and Heavy. It sits in the midtones and shadows like real film grain, with a little colour for colour stocks and none for black and white
 - **Light leak** adds a soft warm leak coming in from one edge of the frame, different every shot
 
-In Film Sim's playback you see the developed copy, and C1 switches to the original. Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at half the photo's width and height. Each one takes a little while, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. You need JPEG files for this, so set Quality to RAW & JPEG or JPEG.
+In Film Sim's playback you see the developed copy, and C1 switches to the original. Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at either a quarter of the photo's width (Small, the default) or half of it (Large). Small copies take seconds, Large ones a minute or two, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. You need JPEG files for this, so set Quality to RAW & JPEG or JPEG.
 
 ## Film stocks
 
@@ -129,6 +129,7 @@ Up and down pick a row, left and right (or the control wheel) change it. The loo
 | Halation | Off or On |
 | Grain | Off, Fine, Medium or Heavy |
 | Light leak | Off or On |
+| Copy size | Small (1500 px wide, quick) or Large (3000 px wide, takes a minute or two) |
 
 Press Fn, centre or MENU to close it. Half pressing the shutter closes it too.
 
