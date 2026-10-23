@@ -119,6 +119,17 @@ design:vision3_50d|Kodak Vision3 50D|Cine|Cine
 design:vision3_250d|Kodak Vision3 250D|Cine|Cine
 design:vision3_200t|Kodak Vision3 200T|Cine|Cine
 design:vision3_500t|Kodak Vision3 500T|Cine|Cine
+design:vision2_200t|Kodak Vision2 200T 5217|Cine|Cine
+design:vision2_500t|Kodak Vision2 500T 5218|Cine|Cine
+design:vision_500t_5279|Kodak Vision 500T 5279|Cine|Cine
+design:exr_5248|Kodak EXR 5248|Cine|Cine
+design:ektachrome_100d|Kodak Ektachrome 100D 7294|Cine|Cine
+design:double_x_5222|Eastman Double-X 5222|Cine|Cine
+design:trix_7266|Kodak Tri-X Reversal 7266|Cine|Cine
+design:orwo_un54|ORWO UN54|Cine|Cine
+design:eterna_500t|Fuji Eterna 500T|Cine|Cine
+design:eterna_vivid_160|Fuji Eterna Vivid 160|Cine|Cine
+design:reala_500d|Fuji Reala 500D|Cine|Cine
 design:eterna_250d|Fuji Eterna 250D|Cine|Cine
 design:eterna_bleach|Fuji Eterna Bleach Bypass|Cine|Cine
 lut_kodak_ektar100.cube|Kodak Ektar 100|Cine|Cine
@@ -132,6 +143,7 @@ design:blue_hour|Blue Hour|Cine|Cine
 design:day_for_night|Day for Night|Cine|Cine
 design:neon_noir|Neon Noir|Cine|Cine
 design:technicolor|Technicolor|Cine|Cine
+design:technicolor_2strip|Technicolor 2-Strip|Cine|Cine
 design:faded_70s|70s Faded|Cine|Cine
 design:super8|Super 8|Cine|Cine
 design:matrix_green|Matrix Green|Cine|Cine
@@ -141,3 +153,4 @@ lut_print_fuji_3510_constlmap.cube|Fuji 3510 Print|Cine|Cinema print
 lut_print_fuji_3513_constlmap.cube|Fuji 3513 Print|Cine|Cinema print
 lut_print_kodak_2383_constlmap.cube|Kodak 2383 Print|Cine|Cinema print
 lut_print_kodak_2393_constlmap.cube|Kodak 2393 Print|Cine|Cinema print
+design:kodak_2302|Kodak 2302 B&W Print|Cine|Cine

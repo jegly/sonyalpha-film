@@ -55,6 +55,19 @@ public class Designer {
         RECIPES.put("vision3_200t", r().con(1.0).sho(0.7).lift(0.05).sat(0.9).gains(0.95, 1.0, 1.06));
         RECIPES.put("vision3_500t", r().bri(1.08).con(0.95).sho(0.65).lift(0.08).sat(0.82).gains(0.96, 1.02, 1.05));
         RECIPES.put("eterna_250d", r().con(0.95).sho(0.65).lift(0.06).sat(0.7).hue(8).gains(0.97, 1.05, 1.05));
+        RECIPES.put("vision2_200t", r().con(1.08).sho(0.7).lift(0.05).sat(0.92).gains(0.98, 1.0, 1.02));
+        RECIPES.put("vision2_500t", r().con(1.08).sho(0.68).lift(0.07).sat(0.88).hue(2).gains(0.97, 1.0, 1.03));
+        RECIPES.put("vision_500t_5279", r().con(1.12).sho(0.7).lift(0.06).sat(0.9).hue(3).gains(1.0, 1.0, 1.02));
+        RECIPES.put("exr_5248", r().con(1.15).sho(0.75).lift(0.04).sat(1.0).gains(1.02, 1.0, 0.97));
+        RECIPES.put("ektachrome_100d", r().con(1.25).sho(0.85).lift(0.01).sat(1.2).gains(0.98, 1.0, 1.04));
+        RECIPES.put("double_x_5222", r().con(1.35).sho(0.8).lift(0.03).sat(0));
+        RECIPES.put("trix_7266", r().bri(1.05).con(1.5).sho(0.85).sat(0));
+        RECIPES.put("orwo_un54", r().con(1.25).sho(0.75).lift(0.05).sat(0));
+        RECIPES.put("eterna_500t", r().con(1.0).sho(0.65).lift(0.07).sat(0.75).hue(6).gains(0.97, 1.04, 1.05));
+        RECIPES.put("eterna_vivid_160", r().con(1.12).sho(0.7).lift(0.04).sat(1.05).hue(4).gains(0.99, 1.03, 1.01));
+        RECIPES.put("reala_500d", r().con(1.05).sho(0.7).lift(0.05).sat(0.95).hue(3).gains(1.0, 1.02, 1.0));
+        RECIPES.put("technicolor_2strip", r().con(1.2).sho(0.85).lift(0.02).sat(1.1).axis(10, 1.3, 0.25).gains(1.02, 0.98, 0.98));
+        RECIPES.put("kodak_2302", r().con(1.4).sho(0.9).sat(0));
         RECIPES.put("kodachrome_40_super8", r().con(1.3).sho(0.85).lift(0.01).sat(1.25).axis(0, 1.15, 0.95).hue(-2).gains(1.03, 1.0, 0.96));
         RECIPES.put("eterna_bleach", r().con(1.45).sho(0.8).lift(0.02).sat(0.45));
         // Cinematic grades

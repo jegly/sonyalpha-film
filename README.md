@@ -10,7 +10,7 @@ You choose a film, the screen shows it in real time, and your JPEGs and videos c
 
 ## What it does
 
-- 140 film looks across Polaroid, Ilford, Kodak, Fujifilm and a Cine section
+- 153 film looks across Polaroid, Ilford, Kodak, Fujifilm and a Cine section
 - Live preview of the look in the viewfinder and on the screen
 - The look is saved into your JPEGs and videos
 - Strength control from 0 to 100% for every look
@@ -62,8 +62,14 @@ BW400CN, ColorPlus 200, Ektachrome 100VS, Ektachrome E100GX, Ektar 100, Elite 10
 **Fujifilm (48)**
 160C, 800Z, Astia 100, Astia 100F, C200, FP-100C, FP-100C Cool, FP-100C Negative, FP-100C Slide, FP-3000B, FP-3000B HC, FP-3000B Negative, FP-3000B Negative Early, Neopan 1600, Neopan Acros 100, Pro 400H, Provia 100, Provia 100F, Provia 400F, Provia 400X, Sensia 100, Superia 100, Superia 200, Superia 200 X-Pro, Superia 400, Superia 800, Superia 1600, Superia HG 1600, Superia Reala 100, Superia X-TRA 400, Superia X-TRA 800, Velvia 50, Velvia 100, plus the X-Trans film simulations: Acros, Acros + G, Acros + R, Acros + Ye, Astia, Classic Chrome, Mono, Mono + G, Mono + R, Mono + Ye, Pro Neg Hi, Pro Neg Std, Provia, Sepia, Velvia
 
-**Cine (31)**
-CineStill 800T, CineStill 800T Cool, CineStill 50D, CineStill 400D, CineStill BwXX, Kodak Vision3 50D, 250D, 200T and 500T, Fuji Eterna 250D, Fuji Eterna Bleach Bypass, Kodak Ektar 100, Kodachrome 64, Kodachrome 200, Kodachrome 40 Super 8, Teal & Orange, Bleach Bypass, Golden Hour, Blue Hour, Day for Night, Neon Noir, Technicolor, 70s Faded, Super 8, Matrix Green, Pastel Symmetry, Desert, and the cinema print films Kodak 2383, Kodak 2393, Fuji 3510 and Fuji 3513
+**Cine (44)**
+Motion picture stocks: CineStill 800T, 800T Cool, 50D, 400D and BwXX, Kodak Vision3 50D, 250D, 200T and 500T, Kodak Vision2 200T 5217 and 500T 5218, Kodak Vision 500T 5279, Kodak EXR 5248, Kodak Ektachrome 100D 7294, Eastman Double-X 5222, Kodak Tri-X Reversal 7266, ORWO UN54, Fuji Eterna 250D and 500T, Fuji Eterna Vivid 160, Fuji Reala 500D, Fuji Eterna Bleach Bypass, Kodak Ektar 100, Kodachrome 64, Kodachrome 200 and Kodachrome 40 Super 8
+
+Grades: Teal & Orange, Bleach Bypass, Golden Hour, Blue Hour, Day for Night, Neon Noir, Technicolor, Technicolor 2-Strip, 70s Faded, Super 8, Matrix Green, Pastel Symmetry, Desert
+
+Cinema print films: Kodak 2383, Kodak 2393, Kodak 2302 B&W, Fuji 3510 and Fuji 3513
+
+The motion picture stocks without a LUT are designed from each film's known character, so treat them as a take on the look rather than a lab-measured match.
 
 For landscapes try Velvia 50, Provia 100F or Ektar 100. For night shots with CineStill 800T, set white balance to Tungsten or around 3200K.
 
