@@ -55,6 +55,7 @@ public class Designer {
         RECIPES.put("vision3_200t", r().con(1.0).sho(0.7).lift(0.05).sat(0.9).gains(0.95, 1.0, 1.06));
         RECIPES.put("vision3_500t", r().bri(1.08).con(0.95).sho(0.65).lift(0.08).sat(0.82).gains(0.96, 1.02, 1.05));
         RECIPES.put("eterna_250d", r().con(0.95).sho(0.65).lift(0.06).sat(0.7).hue(8).gains(0.97, 1.05, 1.05));
+        RECIPES.put("kodachrome_40_super8", r().con(1.3).sho(0.85).lift(0.01).sat(1.25).axis(0, 1.15, 0.95).hue(-2).gains(1.03, 1.0, 0.96));
         RECIPES.put("eterna_bleach", r().con(1.45).sho(0.8).lift(0.02).sat(0.45));
         // Cinematic grades
         RECIPES.put("teal_orange", r().con(1.2).lift(0.03).sat(1.05).axis(30, 1.35, 0.7).gains(1.0, 1.02, 1.06));

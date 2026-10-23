@@ -121,6 +121,10 @@ design:vision3_200t|Kodak Vision3 200T|Cine|Cine
 design:vision3_500t|Kodak Vision3 500T|Cine|Cine
 design:eterna_250d|Fuji Eterna 250D|Cine|Cine
 design:eterna_bleach|Fuji Eterna Bleach Bypass|Cine|Cine
+lut_kodak_ektar100.cube|Kodak Ektar 100|Cine|Cine
+lut_colorslide_kodak_kodachrome_64_generic.cube|Kodachrome 64|Cine|Cine
+lut_colorslide_kodak_kodachrome_200.cube|Kodachrome 200|Cine|Cine
+design:kodachrome_40_super8|Kodachrome 40 Super 8|Cine|Cine
 design:teal_orange|Teal & Orange|Cine|Cine
 design:bleach_bypass|Bleach Bypass|Cine|Cine
 design:golden_hour|Golden Hour|Cine|Cine

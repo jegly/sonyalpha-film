@@ -118,19 +118,23 @@
 117.bin|Kodak Vision3 500T|Cine|Cine|-1.0
 118.bin|Fuji Eterna 250D|Cine|Cine|-1.0
 119.bin|Fuji Eterna Bleach Bypass|Cine|Cine|-1.0
-120.bin|Teal & Orange|Cine|Cine|-1.0
-121.bin|Bleach Bypass|Cine|Cine|-1.0
-122.bin|Golden Hour|Cine|Cine|-1.0
-123.bin|Blue Hour|Cine|Cine|-1.0
-124.bin|Day for Night|Cine|Cine|-1.0
-125.bin|Neon Noir|Cine|Cine|-1.0
-126.bin|Technicolor|Cine|Cine|-1.0
-127.bin|70s Faded|Cine|Cine|-1.0
-128.bin|Super 8|Cine|Cine|-1.0
-129.bin|Matrix Green|Cine|Cine|-1.0
-130.bin|Pastel Symmetry|Cine|Cine|-1.0
-131.bin|Desert|Cine|Cine|-1.0
-132.bin|Fuji 3510 Print|Cine|Cinema print|17.0
-133.bin|Fuji 3513 Print|Cine|Cinema print|17.7
-134.bin|Kodak 2383 Print|Cine|Cinema print|17.3
-135.bin|Kodak 2393 Print|Cine|Cinema print|18.9
+120.bin|Kodak Ektar 100|Cine|Cine|0.6
+121.bin|Kodachrome 64|Cine|Cine|3.3
+122.bin|Kodachrome 200|Cine|Cine|9.6
+123.bin|Kodachrome 40 Super 8|Cine|Cine|-1.0
+124.bin|Teal & Orange|Cine|Cine|-1.0
+125.bin|Bleach Bypass|Cine|Cine|-1.0
+126.bin|Golden Hour|Cine|Cine|-1.0
+127.bin|Blue Hour|Cine|Cine|-1.0
+128.bin|Day for Night|Cine|Cine|-1.0
+129.bin|Neon Noir|Cine|Cine|-1.0
+130.bin|Technicolor|Cine|Cine|-1.0
+131.bin|70s Faded|Cine|Cine|-1.0
+132.bin|Super 8|Cine|Cine|-1.0
+133.bin|Matrix Green|Cine|Cine|-1.0
+134.bin|Pastel Symmetry|Cine|Cine|-1.0
+135.bin|Desert|Cine|Cine|-1.0
+136.bin|Fuji 3510 Print|Cine|Cinema print|17.0
+137.bin|Fuji 3513 Print|Cine|Cinema print|17.7
+138.bin|Kodak 2383 Print|Cine|Cinema print|17.3
+139.bin|Kodak 2393 Print|Cine|Cinema print|18.9
