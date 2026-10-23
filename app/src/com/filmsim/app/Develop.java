@@ -36,6 +36,13 @@ public class Develop {
         }
     }
 
+    /** Takes the finished rows top to bottom: a JPEG encoder, or a bitmap the camera encodes natively. */
+    public interface Sink {
+        void writeRows(int[] rgb, int count) throws IOException;
+
+        void finish() throws IOException;
+    }
+
     /** Lets the caller pause processing (e.g. while the camera writes a photo) or give up. */
     public interface Gate {
         /** Returns false to abandon processing. May block. */
@@ -83,7 +90,7 @@ public class Develop {
         this.opt = options;
     }
 
-    public void process(Source src, JpegWriter out, Gate gate) throws IOException {
+    public void process(Source src, Sink out, Gate gate) throws IOException {
         long startNs = System.nanoTime();
         int w = src.width(), h = src.height();
         // halation glow maps from small previews: the core at about 1/4 size, the halo at about 1/16
@@ -93,7 +100,7 @@ public class Develop {
             small = src.preview(4);
             core = highlights(small);
             blur(core, small.w, small.h, Math.max(1, Math.round(small.w * 0.004f)));
-            tiny = src.preview(16);
+            tiny = shrink(small, 4);
             halo = highlights(tiny);
             blur(halo, tiny.w, tiny.h, Math.max(1, Math.round(tiny.w * 0.025f)));
         }
@@ -289,6 +296,32 @@ public class Develop {
                 + " ms, encode " + tEnc / 1000000 + " ms";
     }
 
+    /** Box-averages an image down by `f`. */
+    private static Image shrink(Image img, int f) {
+        int w = Math.max(2, img.w / f), h = Math.max(2, img.h / f);
+        int[] px = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int r = 0, g = 0, b = 0, n = 0;
+                for (int dy = 0; dy < f; dy++) {
+                    int sy = y * f + dy;
+                    if (sy >= img.h) break;
+                    for (int dx = 0; dx < f; dx++) {
+                        int sx = x * f + dx;
+                        if (sx >= img.w) break;
+                        int c = img.px[sy * img.w + sx];
+                        r += (c >> 16) & 255;
+                        g += (c >> 8) & 255;
+                        b += c & 255;
+                        n++;
+                    }
+                }
+                px[y * w + x] = n == 0 ? 0 : ((r / n) << 16) | ((g / n) << 8) | (b / n);
+            }
+        }
+        return new Image(w, h, px);
+    }
+
     /** Interpolates one row of a low-res map at fractional row fy into row; returns the row's maximum. */
     private static float rowAt(float[] m, int w, int h, float fy, float[] row) {
         if (fy < 0) fy = 0;
@@ -448,7 +481,7 @@ public class Develop {
     }
 
     /** Streaming baseline JPEG encoder, 4:2:0, fed 16 rows at a time. */
-    public static class JpegWriter {
+    public static class JpegWriter implements Sink {
         private static final int[] ZIGZAG = {
             0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5, 12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13, 6, 7, 14, 21,
             28, 35, 42, 49, 56, 57, 50, 43, 36, 29, 22, 15, 23, 30, 37, 44, 51, 58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61,

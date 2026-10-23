@@ -195,7 +195,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                     public void onDone(final String source, final File result, final long millis) {
                         runOnUiThread(new Runnable() {
                             public void run() {
-                                log("developed " + source + " -> " + result.getName() + " in " + millis + " ms: " + developer.lastTiming);
+                                log("developed " + source + " -> " + result.getName() + " in " + millis + " ms: " + developer.lastTiming + " (" + developer.memNote + ")");
                                 showMessage("Developed copy saved: " + result.getName() + " (" + (millis / 1000) + " s)");
                             }
                         });
@@ -1343,6 +1343,17 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             devView.setVisibility(View.GONE);
         }
         boolean devShown = hasDev && showDeveloped && showDevCopy(dev, orientation);
+        // Sony's viewer draws on its own display layer, which can sit above the app's views, so hide it
+        // while the developed copy is on screen
+        playView.setVisibility(devShown ? View.INVISIBLE : View.VISIBLE);
+        if (!devShown && img != null) {
+            try {
+                playView.setOptimizedImage(img);
+            } catch (Throwable t) {
+                log("re-show original failed: " + t);
+            }
+        }
+        log("playback " + data + " | copy " + dev.getPath() + " exists " + hasDev + " shown " + devShown);
         String devLabel = !hasDev ? "" : devShown ? "DEVELOPED (C1: original)   " : "ORIGINAL (C1: developed)   ";
         playInfo.setText(devLabel + name + "   " + (filmUsed != null ? filmUsed + "   " : "") + info
                 + (playIndex + 1) + "/" + playFiles.size() + "      < > browse   Play: back");
