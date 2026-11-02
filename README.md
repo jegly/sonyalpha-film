@@ -1,6 +1,7 @@
 # sonyalpha-film
 
-Film simulation for the Sony A7 II, done in camera.
+Film simulation for the Sony A7XX series done in camera.
+tested on Sony A7II, A7S, A7Sii, A7Rii, a6500 with success.
 
 Fujifilm cameras let you pick a film stock and see it live in the viewfinder, then the JPEG comes out with that look baked in. Sony never offered that. This app adds it to the A7 II through Sony's PlayMemories camera app system.
 
