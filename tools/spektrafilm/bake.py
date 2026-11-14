@@ -11,8 +11,12 @@ Three things differ from spektrafilm's own command line, and each LUT's header s
     (The tool's default for sRGB is 4 stops, which brightens everything by about a stop and a half.)
   - Slide films are scanned directly instead of being printed on paper.
   - The result is scaled so the paper or film base white reaches display white.
+  - The grey curve is blended back towards a straight line (BLEND) and the blacks are lifted (FLOOR). The camera
+    hands the app a finished picture that already has contrast, and the film curve goes on top of it, so the
+    raw result is too dark and contrasty. Colour differences are kept; only the tone is softened.
 """
 import os, sys, shutil, tempfile, warnings
+import numpy as np
 warnings.filterwarnings("ignore")
 
 import spektrafilm.runtime.params_builder as pb
@@ -20,6 +24,8 @@ from spektrafilm_lut_creator import cli
 
 STOPS = 2.47
 WHITE = 0.97
+BLEND = 0.45   # 1 = the film's own grey curve, 0 = a straight line
+FLOOR = 0.025  # lifted black point
 
 # (film, print, output name). Stills negatives go on Kodak or Fuji paper, cine negatives on a cinema print stock.
 JOBS = [
@@ -57,6 +63,17 @@ def init_params(*args, **kwargs):
 pb.init_params = init_params
 
 
+def soften(rows):
+    """Per-channel tone correction: the grey ramp ends up BLEND of the way from a straight line to the film's."""
+    a = np.array(rows)
+    n = round(len(a) ** (1 / 3))
+    f = np.maximum.accumulate(a[[i * (1 + n + n * n) for i in range(n)]].mean(axis=1))
+    x = np.linspace(0, 1, n)
+    f = f + x * 1e-6  # strictly increasing so it can be inverted
+    h = FLOOR + (BLEND * f + (1 - BLEND) * x) * (1 - FLOOR)
+    return np.interp(a, f, h).tolist()
+
+
 def rescale(src, dst, film, positive):
     head, rows = [], []
     for line in open(src):
@@ -67,10 +84,12 @@ def rescale(src, dst, film, positive):
             rows.append([float(x) for x in t.split()])
     white = max(rows[-1])  # last entry of a cube is input 1, 1, 1
     k = WHITE / white if white > 0 else 1.0
+    rows = soften([[min(1.0, v * k) for v in r] for r in rows])
     note = [
         "# Modified for Film Sim (github.com/jegly/sonyalpha-film) by jegly:",
         "#   exposure set to %.2f stops above mid grey;%s" % (STOPS, " slide film scanned, not printed;" if positive else ""),
-        "#   output scaled by %.4f so base white reaches %.2f." % (k, WHITE),
+        "#   output scaled so base white reaches %.2f;" % WHITE,
+        "#   grey curve blended %.0f%% towards the film curve, black lifted to %.3f." % (BLEND * 100, FLOOR),
         "# Derived from spektrafilm by Andrea Volpato, https://github.com/andreavolpato/spektrafilm, CC BY-SA 4.0.",
     ]
     with open(dst, "w") as f:
@@ -78,7 +97,7 @@ def rescale(src, dst, film, positive):
         others = [h for h in head if not h.startswith("#")]
         f.write("\n".join(comments + note + others) + "\n")
         for r in rows:
-            f.write("%.6f %.6f %.6f\n" % tuple(min(1.0, v * k) for v in r))
+            f.write("%.6f %.6f %.6f\n" % tuple(r))
     return white, k
 
 

@@ -89,15 +89,19 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
 
     // Fn menu: one row per setting
     private static final String[] MENU_ROWS = {"Brand", "Film", "Strength", "WB", "Kelvin", "D-Range", "Halation", "Grain",
-            "Light leak", "Copy size", "Front dial", "Rear dial"};
+            "Light leak", "Copy size", "Front dial", "Rear dial", "RAW format"};
     private static final int ROW_BRAND = 0, ROW_FILM = 1, ROW_STRENGTH = 2, ROW_WB = 3, ROW_KELVIN = 4, ROW_DRO = 5,
-            ROW_HALATION = 6, ROW_GRAIN = 7, ROW_LEAK = 8, ROW_SIZE = 9, ROW_FRONT = 10, ROW_REAR = 11;
+            ROW_HALATION = 6, ROW_GRAIN = 7, ROW_LEAK = 8, ROW_SIZE = 9, ROW_FRONT = 10, ROW_REAR = 11, ROW_RAW = 12;
     /** Rows of the menu shown at once, so most of the picture stays visible while changing films. */
     private static final int MENU_WINDOW = 5;
     // What a dial does. Default: front = ISO, rear = shutter speed in S/M and exposure compensation in P/A.
     private static final String[] TURN_NAMES = {"Default", "Aperture", "Shutter speed", "ISO", "Exposure comp", "Film"};
     private static final int TURN_DEFAULT = 0, TURN_APERTURE = 1, TURN_SHUTTER = 2, TURN_ISO = 3, TURN_EV = 4, TURN_FILM = 5;
     private int frontDial, rearDial;
+    /** RAW recording modes the camera offers (compress / uncompress) and the one chosen; the app's own shooting session
+     *  did not inherit the camera menu's uncompressed setting, so it is set here. */
+    private final List<String> rawModes = new ArrayList<String>();
+    private String rawMode = "";
     /** Keys that toggle something ignore auto-repeat and a second press within this many ms. */
     private static final long TOGGLE_GAP_MS = 250;
     private long lastToggleTime;
@@ -173,6 +177,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     // Darkroom: trying films on photos already on the card, from playback
     /** The film being previewed on the photo on screen, or null for plain playback. */
     private FilmLibrary.Film darkFilm;
+    /** A RAW shown from the preview stored inside it, with no darkroom film. */
+    private boolean plainPreview;
     private FilmLibrary.Look darkLook;
     private int darkIndex;
     private int darkStrength = 100;
@@ -311,6 +317,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     /** Settings that have to be (re)applied every time the camera is opened. */
     private void startShooting() {
         if (savedWb != null) setWhiteBalance(savedWb, savedKelvin, false);
+        applyRawMode();
         applyDro();
         applyModeDial();
         applyEvDial();
@@ -611,6 +618,15 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             } catch (Throwable t) {
                 log("dro capabilities failed: " + t);
             }
+            try {
+                rawModes.clear();
+                List rm = m.getSupportedRawRecModes();
+                if (rm != null) for (Object o : rm) rawModes.add(o.toString());
+                CameraEx.ParametersModifier cur = camera.createParametersModifier(camera.getNormalCamera().getParameters());
+                log("raw rec modes " + rawModes + " current " + cur.getRawRecMode());
+            } catch (Throwable t) {
+                log("raw rec modes failed: " + t);
+            }
             wbModes.clear();
             List<String> wb = sup.getSupportedWhiteBalance();
             for (String mode : WB_ORDER) {
@@ -667,6 +683,28 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             log("applyLook failed: " + t);
             showMessage("Could not apply film: " + t);
         }
+    }
+
+    private void applyRawMode() {
+        if (camera == null || rawModes.isEmpty()) return;
+        if (!rawModes.contains(rawMode)) {
+            // first run: uncompressed if the camera offers it
+            rawMode = rawModes.contains(CameraEx.ParametersModifier.RAW_REC_MODE_UNCOMPRESS)
+                    ? CameraEx.ParametersModifier.RAW_REC_MODE_UNCOMPRESS : rawModes.get(0);
+        }
+        try {
+            Camera.Parameters p = camera.createEmptyParameters();
+            camera.createParametersModifier(p).setRawRecMode(rawMode);
+            camera.getNormalCamera().setParameters(p);
+            log("raw rec mode set to " + rawMode);
+        } catch (Throwable t) {
+            log("setRawRecMode failed: " + t);
+        }
+    }
+
+    private static String rawLabel(String mode) {
+        return CameraEx.ParametersModifier.RAW_REC_MODE_UNCOMPRESS.equals(mode) ? "Uncompressed  (about 48 MB)"
+                : CameraEx.ParametersModifier.RAW_REC_MODE_COMPRESS.equals(mode) ? "Compressed  (about 24 MB)" : mode;
     }
 
     private void clearLook() {
@@ -842,6 +880,13 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             case ROW_REAR:
                 rearDial = (rearDial + dir + TURN_NAMES.length) % TURN_NAMES.length;
                 break;
+            case ROW_RAW:
+                if (!rawModes.isEmpty()) {
+                    int i = Math.max(0, rawModes.indexOf(rawMode));
+                    rawMode = rawModes.get((i + dir + rawModes.size()) % rawModes.size());
+                    applyRawMode();
+                }
+                break;
         }
         refreshMenu();
     }
@@ -992,7 +1037,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             filmValue,
             strength + "%",
             wbModes.isEmpty() ? "n/a" : wbLabel(wbMode, kelvin),
-            kelvin + "K" + (WB_KELVIN.equals(wbMode) ? "" : "  (sets WB)"),
+            WB_KELVIN.equals(wbMode) ? kelvin + "K" : "off  (turn to use Kelvin)",
             droLabel(),
             halation ? "On" : "Off",
             grain == GRAIN_AUTO ? "Auto  (by film speed: " + GRAIN_NAMES[grainFor(film)] + ")" : GRAIN_NAMES[grain],
@@ -1000,6 +1045,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             largeCopy ? "Large  (3000 px, slow)" : "Small  (1500 px, fast)",
             frontDial == TURN_DEFAULT ? "Default  (ISO)" : TURN_NAMES[frontDial],
             rearDial == TURN_DEFAULT ? "Default  (shutter in S/M, EV in P/A)" : TURN_NAMES[rearDial],
+            rawModes.isEmpty() ? "n/a" : rawLabel(rawMode.length() > 0 ? rawMode : rawModes.get(0)),
         };
         StringBuilder sb = new StringBuilder();
         // a short window of rows around the highlighted one keeps the picture in view
@@ -1672,6 +1718,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         try {
             OptimizedImageFactory.Options o = new OptimizedImageFactory.Options();
             o.imageType = 3;
+            // without a colour type the picture is shown untagged, which looks lighter than Sony's own playback
+            o.colorType = OptimizedImageFactory.Options.SRGB;
             o.bBasicInfo = true;
             o.bCamInfo = true;
             img = OptimizedImageFactory.decodeImage(data, o);
@@ -1724,6 +1772,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
             try {
                 OptimizedImageFactory.Options o = new OptimizedImageFactory.Options();
                 o.imageType = 3;
+                o.colorType = OptimizedImageFactory.Options.SRGB;
                 devImage = OptimizedImageFactory.decodeImage(dev.getAbsolutePath(), o);
             } catch (Throwable t) {
                 log("viewer decode of copy failed: " + t);
@@ -1759,6 +1808,18 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                     log("re-show original failed: " + t);
                 }
             }
+        }
+        // Sony's viewer seems to render a RAW afresh, without the film look; the saved preview inside the ARW has it
+        plainPreview = !devShown && darkFilm == null && playFile != null && playFile.getName().toUpperCase().endsWith(".ARW");
+        if (plainPreview) {
+            if (previewWorker == null) {
+                previewWorker = new PreviewWorker();
+                previewWorker.start();
+            }
+            int[] ramp = new int[1024];
+            for (int i = 0; i < 1024; i++) ramp[i] = i;
+            previewWorker.request(playFile, playOrientation, new FilmLook(ramp, IDENTITY, 100), ++previewGen);
+            via = "embedded preview";
         }
         log("playback " + name + " | copy " + dev.getName() + " exists " + hasDev + " shown " + devShown + " " + via);
         playHasDev = hasDev;
@@ -1961,7 +2022,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     }
 
     private void showPreview(Bitmap b, int gen) {
-        if (!playback || gen != previewGen || devView == null || darkFilm == null || !showDeveloped) {
+        if (!playback || gen != previewGen || devView == null || (darkFilm == null && !plainPreview) || !showDeveloped) {
             b.recycle();
             return;
         }
@@ -2075,7 +2136,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                     final long t1 = System.currentTimeMillis();
                     if (out == null || out.length != base.length) out = new int[base.length];
                     System.arraycopy(base, 0, out, 0, base.length);
-                    look.apply(out, 0, out.length);
+                    if (!look.isIdentity()) look.apply(out, 0, out.length);
                     final Bitmap b = Bitmap.createBitmap(out, bw, bh, Bitmap.Config.ARGB_8888);
                     final long t2 = System.currentTimeMillis();
                     final String size = bw + "x" + bh, name = f.getName();
@@ -2551,6 +2612,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         }
         pendingFilmKey = film == null && filmKey.startsWith("custom:") ? filmKey : null;
         frontDial = Math.max(0, Math.min(TURN_NAMES.length - 1, prefs.getInt("frontdial", 0)));
+        rawMode = prefs.getString("rawmode", "");
         rearDial = Math.max(0, Math.min(TURN_NAMES.length - 1, prefs.getInt("reardial", 0)));
         look = null;
         bypass = false;
@@ -2574,6 +2636,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
                 .putString("filmname", film == null ? "" : film.external != null ? film.file : favKey(film))
                 .putInt("frontdial", frontDial)
                 .putInt("reardial", rearDial)
+                .putString("rawmode", rawMode)
                 .putString("wb", savedWb)
                 .putInt("kelvin", savedKelvin)
                 .putBoolean("halation", halation)

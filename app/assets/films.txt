@@ -208,28 +208,28 @@
 207.bin|Hong Kong Neon|Cine|Cine|-1.0
 208.bin|Paris Gold|Cine|Cine|-1.0
 209.bin|Silver Screen|Cine|Black & white|-1.0
-210.bin|Portra 160|Spektrafilm|Colour|12.7
-211.bin|Portra 400|Spektrafilm|Colour|12.1
-212.bin|Portra 800|Spektrafilm|Colour|10.7
-213.bin|Portra 800 Push 1|Spektrafilm|Colour|13.8
-214.bin|Portra 800 Push 2|Spektrafilm|Colour|17.1
-215.bin|Gold 200|Spektrafilm|Colour|11.8
-216.bin|Ultramax 400|Spektrafilm|Colour|11.0
-217.bin|Ektar 100|Spektrafilm|Colour|12.7
-218.bin|Fuji C200|Spektrafilm|Colour|12.4
-219.bin|Fuji Pro 400H|Spektrafilm|Colour|10.5
-220.bin|Fuji X-TRA 400|Spektrafilm|Colour|14.4
-221.bin|Provia 100F|Spektrafilm|Slide|10.6
-222.bin|Velvia 100|Spektrafilm|Slide|13.0
-223.bin|Ektachrome 100|Spektrafilm|Slide|11.0
-224.bin|Kodachrome 64|Spektrafilm|Slide|11.2
-225.bin|Vision3 50D on 2383|Spektrafilm|Cine|11.1
-226.bin|Vision3 250D on 2383|Spektrafilm|Cine|11.2
-227.bin|Vision3 200T on 2383|Spektrafilm|Cine|12.7
-228.bin|Vision3 500T on 2383|Spektrafilm|Cine|12.5
-229.bin|Vision3 250D on 2393|Spektrafilm|Cine|11.6
-230.bin|Vision3 500T on 2393|Spektrafilm|Cine|12.7
-231.bin|Verita 200D on 2383|Spektrafilm|Cine|12.0
+210.bin|Portra 160|Spektrafilm|Colour|10.7
+211.bin|Portra 400|Spektrafilm|Colour|10.7
+212.bin|Portra 800|Spektrafilm|Colour|9.8
+213.bin|Portra 800 Push 1|Spektrafilm|Colour|13.5
+214.bin|Portra 800 Push 2|Spektrafilm|Colour|16.3
+215.bin|Gold 200|Spektrafilm|Colour|10.6
+216.bin|Ultramax 400|Spektrafilm|Colour|10.2
+217.bin|Ektar 100|Spektrafilm|Colour|11.7
+218.bin|Fuji C200|Spektrafilm|Colour|11.8
+219.bin|Fuji Pro 400H|Spektrafilm|Colour|9.7
+220.bin|Fuji X-TRA 400|Spektrafilm|Colour|13.4
+221.bin|Provia 100F|Spektrafilm|Slide|8.5
+222.bin|Velvia 100|Spektrafilm|Slide|10.2
+223.bin|Ektachrome 100|Spektrafilm|Slide|8.2
+224.bin|Kodachrome 64|Spektrafilm|Slide|8.3
+225.bin|Vision3 50D on 2383|Spektrafilm|Cine|9.5
+226.bin|Vision3 250D on 2383|Spektrafilm|Cine|9.4
+227.bin|Vision3 200T on 2383|Spektrafilm|Cine|10.4
+228.bin|Vision3 500T on 2383|Spektrafilm|Cine|9.8
+229.bin|Vision3 250D on 2393|Spektrafilm|Cine|9.6
+230.bin|Vision3 500T on 2393|Spektrafilm|Cine|10.1
+231.bin|Verita 200D on 2383|Spektrafilm|Cine|10.0
 232.bin|Pastel Sky|Moods|Colour|-1.0
 233.bin|Pastel Portrait|Moods|Colour|-1.0
 234.bin|Airy Blue|Moods|Colour|-1.0
