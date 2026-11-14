@@ -16,6 +16,15 @@ public class Decomposer {
     private static final int ITERS = 30;
 
     public static LutParams decompose(Cube cube) {
+        return decompose(cube, false);
+    }
+
+    /**
+     * photoWeighted: fit the colours that real photos are made of (greys, skin, sky, foliage: low to medium
+     * saturation) more closely, at the cost of the extreme saturated corners of the cube that hardly ever occur.
+     * A curve plus a matrix can't match a film LUT everywhere, so this chooses where the misses go.
+     */
+    public static LutParams decompose(Cube cube, boolean photoWeighted) {
         int n = GRID * GRID * GRID;
         // 采样网格
         float[] X = new float[n * 3];
@@ -44,6 +53,14 @@ public class Decomposer {
             knotIdx[i] = Math.round(X[i] * (KNOTS - 1));
         }
 
+        double[] wt = new double[n];
+        for (int i = 0; i < n; i++) {
+            double mx = Math.max(X[i * 3], Math.max(X[i * 3 + 1], X[i * 3 + 2]));
+            double mn = Math.min(X[i * 3], Math.min(X[i * 3 + 1], X[i * 3 + 2]));
+            double sat = mx - mn;
+            wt[i] = photoWeighted ? 0.05 + Math.exp(-(sat / 0.4) * (sat / 0.4)) : 1.0;
+        }
+
         for (int it = 0; it < ITERS; it++) {
             // U = g(X)
             for (int i = 0; i < n * 3; i++) {
@@ -53,10 +70,12 @@ public class Decomposer {
             double[][] A = new double[3][3];
             double[][] B = new double[3][3];
             for (int i = 0; i < n; i++) {
-                double u0 = U[i * 3], u1 = U[i * 3 + 1], u2 = U[i * 3 + 2];
-                A[0][0] += u0 * u0; A[0][1] += u0 * u1; A[0][2] += u0 * u2;
-                A[1][0] += u1 * u0; A[1][1] += u1 * u1; A[1][2] += u1 * u2;
-                A[2][0] += u2 * u0; A[2][1] += u2 * u1; A[2][2] += u2 * u2;
+                double wi = wt[i];
+                double u0 = U[i * 3] * wi, u1 = U[i * 3 + 1] * wi, u2 = U[i * 3 + 2] * wi;
+                double v0 = U[i * 3], v1 = U[i * 3 + 1], v2 = U[i * 3 + 2];
+                A[0][0] += u0 * v0; A[0][1] += u0 * v1; A[0][2] += u0 * v2;
+                A[1][0] += u1 * v0; A[1][1] += u1 * v1; A[1][2] += u1 * v2;
+                A[2][0] += u2 * v0; A[2][1] += u2 * v1; A[2][2] += u2 * v2;
                 B[0][0] += u0 * L[i * 3];     B[0][1] += u0 * L[i * 3 + 1]; B[0][2] += u0 * L[i * 3 + 2];
                 B[1][0] += u1 * L[i * 3];     B[1][1] += u1 * L[i * 3 + 1]; B[1][2] += u1 * L[i * 3 + 2];
                 B[2][0] += u2 * L[i * 3];     B[2][1] += u2 * L[i * 3 + 1]; B[2][2] += u2 * L[i * 3 + 2];
@@ -89,8 +108,8 @@ public class Decomposer {
                     }
                     double r0 = L[i * 3] - o0, r1 = L[i * 3 + 1] - o1, r2 = L[i * 3 + 2] - o2;
                     int k = knotIdx[i * 3 + c];
-                    num[k] += m0 * r0 + m1 * r1 + m2 * r2;
-                    den[k] += m2sq;
+                    num[k] += (m0 * r0 + m1 * r1 + m2 * r2) * wt[i];
+                    den[k] += m2sq * wt[i];
                 }
             }
             // 每 knot 的 LS 解 + 空 knot 插值

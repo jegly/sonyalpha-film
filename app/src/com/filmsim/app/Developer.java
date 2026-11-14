@@ -15,8 +15,9 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 
 /**
- * Background queue that makes developed copies (halation, grain, light leaks) of JPEGs in FILMSIM/DEV, at
- * a half (Large) or quarter (Small) of the photo's width and height.
+ * Background queue that makes developed copies (halation, grain, light leaks, and film looks chosen in
+ * playback) in FILMSIM/DEV, at a half (Large) or quarter (Small) of the photo's width and height.
+ * A RAW file is developed from the JPEG preview stored inside it. The original photo is only ever read.
  * Each copy is written to a .TMP file and renamed when complete, so a cut-off run never leaves a broken JPEG.
  */
 public class Developer {
@@ -32,11 +33,36 @@ public class Developer {
     }
 
     private static final long MB = 1024 * 1024;
+    /** BitmapFactory.Options.inMutable: on the camera (Android 4.1) but not in the old SDK the app is built with. */
+    private static final java.lang.reflect.Field IN_MUTABLE = inMutableField();
+
+    private static java.lang.reflect.Field inMutableField() {
+        try {
+            return BitmapFactory.Options.class.getField("inMutable");
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 
     private final File outDir;
     private final Listener listener;
-    private final LinkedList<File> queue = new LinkedList<File>();
-    private final java.util.HashMap<File, Develop.Options> options = new java.util.HashMap<File, Develop.Options>();
+    /** One copy to make: the photo, what to do to it, and the output name without extension. */
+    private static class Job {
+        final File src;
+        final Develop.Options opt;
+        final String out;
+
+        Job(File src, Develop.Options opt, String out) {
+            this.src = src;
+            this.opt = opt;
+            this.out = out;
+        }
+    }
+
+    /** Second letter of a copy's name: V for the first copy, then 2-9 and A-Z for further versions. */
+    private static final String SLOTS = "V23456789ABCDEFGHJKLMNPQRSTUWXYZ";
+
+    private final LinkedList<Job> queue = new LinkedList<Job>();
     private volatile boolean cancelled;
     private Thread worker;
     /** Size, effects and time per stage of the last copy, for the log. */
@@ -50,10 +76,44 @@ public class Developer {
         cleanTemp();
     }
 
+    /** The copy made right after a shot: always DVnnnnn.JPG. */
     public synchronized void add(File jpeg, Develop.Options opt) {
-        if (queue.contains(jpeg)) return;
-        queue.add(jpeg);
-        options.put(jpeg, opt);
+        String out = outName(jpeg.getName());
+        if (queued(out)) return;
+        enqueue(new Job(jpeg, opt, out));
+    }
+
+    /** A copy asked for in playback (JPEG or RAW). Each one gets its own name, which is returned. */
+    public synchronized String addCopy(File photo, Develop.Options opt) {
+        String out = null;
+        for (int i = 0; i < SLOTS.length(); i++) {
+            out = outName(photo.getName(), SLOTS.charAt(i));
+            if (!new File(outDir, out + ".JPG").exists() && !queued(out)) break;
+        }
+        enqueue(new Job(photo, opt, out));
+        return out;
+    }
+
+    /** The newest copy of a photo, or null when it has none. */
+    public static File newestCopy(File outDir, String photo) {
+        File best = null;
+        for (int i = 0; i < SLOTS.length(); i++) {
+            File f = new File(outDir, outName(photo, SLOTS.charAt(i)) + ".JPG");
+            if (f.isFile()) best = f;
+            else if (i > 0) break;
+        }
+        return best;
+    }
+
+    private boolean queued(String out) {
+        for (Job j : queue) {
+            if (j.out.equals(out)) return true;
+        }
+        return false;
+    }
+
+    private void enqueue(Job job) {
+        queue.add(job);
         listener.onStatus(queue.size());
         if (worker == null) {
             cancelled = false;
@@ -76,13 +136,12 @@ public class Developer {
         cancelled = true;
         synchronized (this) {
             queue.clear();
-            options.clear();
         }
     }
 
     private void loop() {
         while (true) {
-            File next;
+            Job next;
             synchronized (this) {
                 if (queue.isEmpty() || cancelled) {
                     worker = null;
@@ -92,30 +151,41 @@ public class Developer {
                 }
                 next = queue.peek();
             }
-            Develop.Options opt;
-            synchronized (this) {
-                opt = options.get(next);
-            }
             long t0 = System.currentTimeMillis();
             try {
-                File result = develop(next, opt);
-                listener.onDone(next.getName(), result, System.currentTimeMillis() - t0);
+                File result = develop(next);
+                listener.onDone(next.src.getName(), result, System.currentTimeMillis() - t0);
             } catch (Throwable t) {
-                if (!cancelled) listener.onFailed(next.getName(), t);
+                if (!cancelled) listener.onFailed(next.src.getName(), t);
             }
             synchronized (this) {
                 queue.remove(next);
-                options.remove(next);
                 listener.onStatus(queue.size());
             }
         }
     }
 
-    private File develop(File src, Develop.Options opt) throws IOException {
-        waitUntilStable(src);
+    private File develop(Job job) throws IOException {
+        Develop.Options opt = job.opt;
+        waitUntilStable(job.src);
         outDir.mkdirs();
-        File tmp = new File(outDir, outName(src.getName()) + ".TMP");
-        File done = new File(outDir, outName(src.getName()) + ".JPG");
+        File tmp = new File(outDir, job.out + ".TMP");
+        File done = new File(outDir, job.out + ".JPG");
+        File src = job.src;
+        File preview = null;
+        if (src.getName().toUpperCase().endsWith(".ARW")) {
+            // a RAW file: work from the JPEG preview stored inside it, copied out to a scratch file
+            byte[] jpeg = ArwPreview.read(src);
+            if (jpeg == null) throw new IOException("no preview inside " + src.getName());
+            preview = new File(outDir, job.out + ".PRV");
+            FileOutputStream fo = new FileOutputStream(preview);
+            try {
+                fo.write(jpeg);
+            } finally {
+                fo.close();
+            }
+            src = preview;
+        }
         byte[] exif = null;
         try {
             exif = Develop.readExif(new FileInputStream(src));
@@ -123,13 +193,22 @@ public class Developer {
         }
         boolean ok = false;
         try {
-            String how = developNative(src, tmp, opt, exif);
+            String how;
+            try {
+                how = developNative(src, tmp, opt, exif);
+            } catch (OutOfMemoryError e) {
+                // ran out part way through: start again the slow way, which needs very little memory
+                memNote += ", out of memory, streaming";
+                tmp.delete();
+                how = null;
+            }
             if (how == null) how = developStreaming(src, tmp, opt, exif);
-            lastTiming = (opt.halation ? "halation " : "") + (opt.grain > 0 ? "grain" + opt.grain + " " : "")
+            lastTiming = (opt.look != null ? "film " : "") + (opt.halation ? "halation " : "") + (opt.grain > 0 ? "grain" + opt.grain + " " : "")
                     + (opt.lightLeak ? "leak " : "") + "| " + how;
             ok = true;
         } finally {
             if (!ok) tmp.delete();
+            if (preview != null) preview.delete();
         }
         done.delete();
         if (!tmp.renameTo(done)) throw new IOException("could not rename " + tmp.getName());
@@ -164,8 +243,13 @@ public class Developer {
         Runtime rt = Runtime.getRuntime();
         long free = rt.maxMemory() - (rt.totalMemory() - rt.freeMemory());
         String mem = "heap " + rt.maxMemory() / MB + " MB, free " + free / MB + " MB";
-        // room for the decoded bitmap, an editable copy of it, and a little headroom
-        if (bounds.outWidth <= 0 || free < bytes * 2 + 4 * MB) {
+        // the grain texture and the working rows need room too
+        long work = (opt.grain > 0 ? 7 : 1) * MB + 3 * MB;
+        // Usual way: the decoded bitmap plus an editable copy of it. When that doesn't fit, ask the decoder for
+        // an editable bitmap straight away, which needs half the memory.
+        // Small sources (the preview from a RAW) always go this way: the log showed the copy failing with 19 MB free.
+        boolean direct = IN_MUTABLE != null && (sample == 1 || free < bytes * 2 + 4 * MB);
+        if (bounds.outWidth <= 0 || free < bytes + work || (IN_MUTABLE == null && free < bytes * 2 + 4 * MB)) {
             memNote = mem + ", streaming";
             return null;
         }
@@ -174,7 +258,25 @@ public class Developer {
         o.inSampleSize = sample;
         Bitmap decoded = null;
         BitmapRegionDecoder region = null;
-        try {
+        if (direct) {
+            // one big block is needed; tidy the heap first so it is more likely to be there
+            System.gc();
+            try {
+                IN_MUTABLE.setBoolean(o, true);
+                decoded = BitmapFactory.decodeFile(src.getPath(), o);
+            } catch (OutOfMemoryError e) {
+                decoded = null;
+            } catch (Exception e) {
+                decoded = null;
+            }
+            if (decoded != null && !decoded.isMutable()) {
+                // no room for the copy that would be needed
+                decoded.recycle();
+                memNote = mem + ", decoder gave a read-only bitmap, streaming";
+                return null;
+            }
+        }
+        if (decoded == null && !direct) try {
             // the region decoder is noticeably quicker than decodeFile on the camera
             region = BitmapRegionDecoder.newInstance(src.getPath(), false);
             if (region != null) decoded = region.decodeRegion(new Rect(0, 0, region.getWidth(), region.getHeight()), o);
@@ -183,7 +285,7 @@ public class Developer {
         } finally {
             if (region != null) region.recycle();
         }
-        if (decoded == null) {
+        if (decoded == null && !direct) {
             try {
                 decoded = BitmapFactory.decodeFile(src.getPath(), o);
             } catch (OutOfMemoryError e) {
@@ -211,7 +313,7 @@ public class Developer {
             }
             full = copy;
         }
-        memNote = mem + ", native";
+        memNote = mem + (direct ? ", native (direct)" : ", native");
         long t1 = System.currentTimeMillis();
         final int w = full.getWidth(), h = full.getHeight();
         try {
@@ -369,20 +471,25 @@ public class Developer {
 
     /** 8.3-safe output name: "DV" plus the photo's number, e.g. JES05218.JPG -> DV05218. */
     static String outName(String photo) {
+        return outName(photo, 'V');
+    }
+
+    static String outName(String photo, char slot) {
         StringBuilder digits = new StringBuilder();
         for (char c : photo.toCharArray()) {
             if (c == '.') break;
             if (Character.isDigit(c)) digits.append(c);
         }
         String d = digits.length() > 6 ? digits.substring(digits.length() - 6) : digits.toString();
-        return "DV" + (d.length() > 0 ? d : "0");
+        return "D" + slot + (d.length() > 0 ? d : "0");
     }
 
     private void cleanTemp() {
         File[] files = outDir.listFiles();
         if (files == null) return;
         for (File f : files) {
-            if (f.getName().toUpperCase().endsWith(".TMP")) f.delete();
+            String n = f.getName().toUpperCase();
+            if (n.endsWith(".TMP") || n.endsWith(".PRV")) f.delete();
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.filmsim.app;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.ViewParent;
@@ -22,5 +24,15 @@ public class FullRedrawLayout extends RelativeLayout {
     public ViewParent invalidateChildInParent(int[] location, Rect dirty) {
         invalidate();
         return null;
+    }
+
+    /**
+     * Wipes the overlay before drawing the views. In playback nothing of ours sits behind the text (the photo
+     * is on Sony's own layer), so a message or menu that was hidden stayed painted on screen.
+     */
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        super.dispatchDraw(canvas);
     }
 }

@@ -60,9 +60,11 @@ public class Develop {
         public boolean monochrome;
         /** Varies grain and leaks between photos; use something unique per photo. */
         public long seed;
+        /** A film look to put on the photo first (photos developed from playback), or null. */
+        public FilmLook look;
 
         public boolean any() {
-            return halation || grain > 0 || lightLeak;
+            return halation || grain > 0 || lightLeak || look != null;
         }
     }
 
@@ -77,6 +79,9 @@ public class Develop {
     // Grain: peak strength in levels (0-255) and clump size in pixels at 3000 px wide, per level.
     private static final float[] GRAIN_STRENGTH = {0, 7f, 11f, 17f, 18f};
     private static final float[] GRAIN_CLUMP = {1, 1.1f, 1.6f, 2.3f, 3.6f};
+
+    // Grain size per unit of strength: brightness grain, and the smaller colour grain of the separate film layers.
+    private static final float GRAIN_LUMA = 0.51f, GRAIN_CHROMA = 0.14f;
 
     private static final int LEAK_GRID = 8;    // light leak worked out every 8 px, then stretched
     private static final int GRAIN_TILE = 512; // grain texture size, tiled across the photo
@@ -100,6 +105,8 @@ public class Develop {
         float[] core = null, halo = null;
         if (opt.halation) {
             small = src.preview(4);
+            // the glow has to come from the photo as it will look with the film on it
+            if (opt.look != null) opt.look.apply(small.px, 0, small.px.length);
             core = highlights(small);
             float[] core0 = core.clone();
             blur(core, small.w, small.h, Math.max(1, Math.round(small.w * 0.004f)));
@@ -175,20 +182,25 @@ public class Develop {
             }
         }
 
-        // Grain from a pre-built tile (luma plus two colour channels), shifted per photo.
+        // Grain from pre-built tiles, shifted per photo. Two random fields are made, a fine one and a coarse one,
+        // each white noise softened to the clump size. Brightness grain is a blend of both. The colour layers of
+        // film each have their own grain, so red reuses the fine field and blue the coarse one (the blue layer
+        // is the grainiest in real film), read from a different place in the tile so they don't line up.
         float[] tileL = null, tileR = null, tileB = null;
         int tileX = rnd.nextInt(GRAIN_TILE), tileY = rnd.nextInt(GRAIN_TILE);
         if (opt.grain > 0) {
-            tileL = new float[GRAIN_TILE * GRAIN_TILE];
-            tileR = new float[GRAIN_TILE * GRAIN_TILE];
-            tileB = new float[GRAIN_TILE * GRAIN_TILE];
+            float[] fine = grainField(cell * 0.45f, noiseSeed);
+            float[] coarse = grainField(cell * 2.3f * 0.45f, noiseSeed + 101);
+            int n = GRAIN_TILE * GRAIN_TILE, mask = GRAIN_TILE - 1;
+            tileL = new float[n];
+            tileR = new float[n];
+            tileB = new float[n];
             for (int ty = 0; ty < GRAIN_TILE; ty++) {
                 for (int tx = 0; tx < GRAIN_TILE; tx++) {
                     int k = ty * GRAIN_TILE + tx;
-                    tileL[k] = (0.65f * tileNoise(tx, ty, cell, noiseSeed) + 0.35f * tileNoise(tx, ty, cell * 2.3f, noiseSeed + 101))
-                            * strength * 1.6f;
-                    tileR[k] = tileNoise(tx, ty, cell, noiseSeed + 211) * strength * 0.45f;
-                    tileB[k] = tileNoise(tx, ty, cell, noiseSeed + 307) * strength * 0.45f;
+                    tileL[k] = (0.8f * fine[k] + 0.6f * coarse[k]) * strength * GRAIN_LUMA;
+                    tileR[k] = fine[((ty + 173) & mask) * GRAIN_TILE + ((tx + 311) & mask)] * strength * GRAIN_CHROMA;
+                    tileB[k] = coarse[((ty + 97) & mask) * GRAIN_TILE + ((tx + 419) & mask)] * strength * GRAIN_CHROMA * 1.2f;
                 }
             }
         }
@@ -232,6 +244,7 @@ public class Develop {
             src.read(y0, n, band);
             long t1 = System.nanoTime();
             tRead += t1 - t0;
+            if (opt.look != null) opt.look.apply(band, 0, n * w);
             for (int r = 0; r < n; r++) {
                 int y = y0 + r;
                 int base = r * w;
@@ -240,7 +253,7 @@ public class Develop {
                 boolean doLeak = opt.lightLeak && rowAt3(leakR, leakG, leakB, lw, lh, y / (float) LEAK_GRID, leakRowR, leakRowG, leakRowB) > 0.002f;
                 int tileRow = ((y + tileY) & tileMask) * GRAIN_TILE;
                 if (!doHalation && !doLeak) {
-                    if (opt.grain > 0) grainRow(band, base, w, tileRow, tileX, tileMask, tileLi, tileRi, tileBi, grainWeightI, opt.monochrome);
+                    if (opt.grain > 0 && strength > 0) grainRow(band, base, w, tileRow, tileX, tileMask, tileLi, tileRi, tileBi, grainWeightI, opt.monochrome);
                     continue;
                 }
                 for (int x = 0; x < w; x++) {
@@ -403,17 +416,58 @@ public class Develop {
     }
 
     /** Grain noise that wraps around at the tile edge, so the tile repeats without a seam. */
-    private static float tileNoise(int x, int y, float cell, int seed) {
-        int period = Math.max(1, Math.round(GRAIN_TILE / cell));
-        float gx = x * period / (float) GRAIN_TILE, gy = y * period / (float) GRAIN_TILE;
-        int xi = (int) gx, yi = (int) gy;
-        float fx = gx - xi, fy = gy - yi;
-        fx = fx * fx * (3 - 2 * fx);
-        fy = fy * fy * (3 - 2 * fy);
-        float a = hash(xi % period, yi % period, seed), b = hash((xi + 1) % period, yi % period, seed);
-        float c = hash(xi % period, (yi + 1) % period, seed), d = hash((xi + 1) % period, (yi + 1) % period, seed);
-        float top = a + (b - a) * fx, bot = c + (d - c) * fx;
-        return top + (bot - top) * fy;
+    /**
+     * One tile of grain: bell-curve random values, softened with a Gaussian blur of the given radius so they form
+     * clumps of that size, then scaled so the tile's overall strength is 1 whatever the clump size. The blur wraps
+     * round the edges so the tile repeats without seams.
+     */
+    static float[] grainField(float sigma, int seed) {
+        final int size = GRAIN_TILE, mask = size - 1, n = size * size;
+        float[] f = new float[n];
+        int s = seed * 0x9E3779B9 + 0x7F4A7C15;
+        if (s == 0) s = 1;
+        for (int i = 0; i < n; i++) {
+            // four quick random numbers added together are close enough to a bell curve
+            int sum = 0;
+            for (int k = 0; k < 4; k++) {
+                s ^= s << 13;
+                s ^= s >>> 17;
+                s ^= s << 5;
+                sum += s & 0xFFFF;
+            }
+            f[i] = sum - 131070;
+        }
+        if (sigma >= 0.3f) {
+            int r = Math.min(12, Math.max(1, (int) Math.ceil(sigma * 2.6f)));
+            float[] kern = new float[2 * r + 1];
+            float total = 0;
+            for (int i = -r; i <= r; i++) {
+                kern[i + r] = (float) Math.exp(-i * i / (2.0 * sigma * sigma));
+                total += kern[i + r];
+            }
+            for (int i = 0; i < kern.length; i++) kern[i] /= total;
+            float[] t = new float[n];
+            for (int y = 0; y < size; y++) {
+                int row = y * size;
+                for (int x = 0; x < size; x++) {
+                    float v = 0;
+                    for (int i = -r; i <= r; i++) v += f[row + ((x + i) & mask)] * kern[i + r];
+                    t[row + x] = v;
+                }
+            }
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    float v = 0;
+                    for (int i = -r; i <= r; i++) v += t[((y + i) & mask) * size + x] * kern[i + r];
+                    f[y * size + x] = v;
+                }
+            }
+        }
+        double sq = 0;
+        for (int i = 0; i < n; i++) sq += f[i] * f[i];
+        float scale = (float) (1 / Math.sqrt(sq / n + 1e-9));
+        for (int i = 0; i < n; i++) f[i] *= scale;
+        return f;
     }
 
     /** Smooth random field in [-1, 1]: hashed values on an integer grid, blended with a smoothstep curve. */

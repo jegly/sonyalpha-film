@@ -11,14 +11,16 @@ You choose a film, the screen shows it in real time, and your JPEGs and videos c
 
 ## What it does
 
-- 153 film looks across Polaroid, Ilford, Kodak, Fujifilm and a Cine section
+- 238 film looks across Polaroid, Ilford, Agfa, Rollei, Kodak, Fujifilm, a Cine section, a Spektrafilm section and a few Moods
 - Live preview of the look in the viewfinder and on the screen
 - The look is saved into your JPEGs and videos
 - Strength control from 0 to 100% for every look
 - Favourites, so the films you use most are at the top
 - Load your own `.cube` LUTs from the SD card
-- Optional halation, film grain and light leaks, added to a copy of each JPEG after you shoot
-- Full manual exposure: shutter speed, ISO (including Auto), exposure compensation and the mode dial (P, A, S, M)
+- Optional halation, film grain and light leaks, added to a copy of each photo after you shoot
+- A darkroom in playback: try any film on photos you've already taken and save the ones you like as copies
+- Full manual exposure: shutter speed, aperture (with lenses the camera can control), ISO (including Auto), exposure compensation and the mode dial (P, A, S, M)
+- Choose what the front and rear dials do
 - White balance presets and Kelvin in 100K steps
 - Focus magnifier for manual lenses
 - Video recording with the look applied (MOVIE button)
@@ -57,35 +59,72 @@ Your LUTs stay on your card and are never part of the app, so this is the way to
 Turn these on in the Fn menu and the app makes a developed copy of each JPEG in the background after you shoot. Your original file is never changed.
 
 - **Halation** adds the red orange glow that bleeds around lights on CineStill film
-- **Grain** comes in Fine, Medium, Heavy and Coarse (bigger clumps, like pushed high speed film). It sits in the midtones and shadows like real film grain, with a little colour for colour stocks and none for black and white
+- **Grain** comes in Fine, Medium, Heavy and Coarse (bigger clumps, like pushed high speed film), or Auto, which follows the speed of the film you picked. It sits in the midtones and shadows like real film grain. Colour films get a little separate grain in each colour layer, coarsest in blue as on real film, and black and white films get none
 - **Light leak** adds a soft warm leak coming in from one edge of the frame, different every shot
 
-In Film Sim's playback you see the developed copy, and C1 switches to the original. Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at either a quarter of the photo's width (Small, the default) or half of it (Large). Small copies take seconds, Large ones a minute or two, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. You need JPEG files for this, so set Quality to RAW & JPEG or JPEG.
+In Film Sim's playback you see the developed copy, and C1 switches to the original. Copies are saved to `FILMSIM/DEV` on the card as `DV` plus the photo number, for example `DV05218.JPG`, at either a quarter of the photo's width (Small, the default) or half of it (Large). Small copies take seconds, Large ones a minute or two, and the screen shows "Developing" while it works. It pauses while you take a photo or record, so it never gets in the way. If you shoot RAW only, the copy is made from the preview picture inside the RAW file and is 1616 px wide. For bigger copies set Quality to RAW & JPEG or JPEG.
+
+## Darkroom: films on photos you've already taken
+
+Press Play to review your photos, then press up or down (or turn the front or rear dial). The photo on screen is shown with a film on it. Keep pressing to go through the films, starting from the one you had selected for shooting. Your favourites come first.
+
+- **Up and down** change the film
+- **Fn** opens a small menu with Brand, Film and Strength rows, so you can jump straight to a brand. Up and down pick a row, left and right change it, Fn closes it
+- **C2** changes the strength
+- **C1** flips between the preview and the original
+- **Centre** saves a copy with that film. If halation, grain or light leak are turned on in the Fn menu they are added too
+- **Delete** goes back to plain playback
+- **Left and right** move to another photo and keep the same film, so you can check one look across a whole set
+
+The original photo is never changed. Copies go to `FILMSIM/DEV` next to the developed ones. The first copy of a photo is `DV` plus its number, and further versions are `D2`, `D3` and so on, so you can keep several looks of the same shot.
+
+It works on JPEGs and on RAW files. For a RAW file the app uses the small preview picture that the camera stores inside every RAW, so those copies are 1616 px wide. JPEG copies follow the Copy size setting. If you shot RAW & JPEG the JPEG is used.
+
+One thing to know: if a photo was taken with a film already on it, the darkroom film goes on top of that. The line under the photo tells you which film it was shot on. For the cleanest result start from photos taken with no film, or with Strength at 0.
 
 ## Film stocks
 
 **Polaroid (22)**
 664, 665, 665 Negative, 665 Negative HC, 667, 669, 669 Cold, 672, 690, 690 Cold, 690 Warm, Polachrome, PX-100UV+ Cold, PX-100UV+ Warm, PX-680, PX-680 Cold, PX-680 Warm, PX-70, PX-70 Cold, PX-70 Warm, Time Zero Expired, Time Zero Expired Cold
 
-**Ilford (8)**
-Delta 100, Delta 400, Delta 3200, FP4 Plus 125, HP5 Plus 400, HPS 800, Pan F Plus 50, XP2
+**Ilford (11)**
+Delta 100, Delta 400, Delta 3200, FP4 Plus 125, HP5 Plus 400, HPS 800, Pan F Plus 50, XP2, Ortho Plus 80, SFX 200, Kentmere 400
 
-**Kodak (31)**
-BW400CN, ColorPlus 200, Ektachrome 100VS, Ektachrome E100GX, Ektar 100, Elite 100 X-Pro, Elite Chrome 200, Elite Chrome 400, Elite Color 200, Elite Color 400, Elite Extracolor 100, Gold 200, Gold 200 Warm, HIE Infrared, Kodachrome 25, Kodachrome 64, Kodachrome 200, Portra 160, Portra 160 NC, Portra 160 VC, Portra 400, Portra 400 NC, Portra 400 UC, Portra 400 VC, Portra 800, Portra 800 HC, T-Max 100, T-Max 400, T-Max 3200, Tri-X 400, Ultramax 400
+**Agfa (7)**
+APX 25, APX 100, Precisa 100, Ultra Color 100, Vista 200, Optima 200, Scala 200X
 
-**Fujifilm (48)**
-160C, 800Z, Astia 100, Astia 100F, C200, FP-100C, FP-100C Cool, FP-100C Negative, FP-100C Slide, FP-3000B, FP-3000B HC, FP-3000B Negative, FP-3000B Negative Early, Neopan 1600, Neopan Acros 100, Pro 400H, Provia 100, Provia 100F, Provia 400F, Provia 400X, Sensia 100, Superia 100, Superia 200, Superia 200 X-Pro, Superia 400, Superia 800, Superia 1600, Superia HG 1600, Superia Reala 100, Superia X-TRA 400, Superia X-TRA 800, Velvia 50, Velvia 100, plus the X-Trans film simulations: Acros, Acros + G, Acros + R, Acros + Ye, Astia, Classic Chrome, Mono, Mono + G, Mono + R, Mono + Ye, Pro Neg Hi, Pro Neg Std, Provia, Sepia, Velvia
+**Rollei (4)**
+IR 400, Ortho 25, Retro 100 Tonal, Retro 80S
 
-**Cine (44)**
-Motion picture stocks: CineStill 800T, 800T Cool, 50D, 400D and BwXX, Kodak Vision3 50D, 250D, 200T and 500T, Kodak Vision2 200T 5217 and 500T 5218, Kodak Vision 500T 5279, Kodak EXR 5248, Kodak Ektachrome 100D 7294, Eastman Double-X 5222, Kodak Tri-X Reversal 7266, ORWO UN54, Fuji Eterna 250D and 500T, Fuji Eterna Vivid 160, Fuji Reala 500D, Fuji Eterna Bleach Bypass, Kodak Ektar 100, Kodachrome 64, Kodachrome 200 and Kodachrome 40 Super 8
+**More film (8)**
+Harman Phoenix 200, ORWO Wolfen NC500, Adox Color Mission 200, Fomapan 100, Fomapan 400, Adox CMS 20, JCH StreetPan 400, Bergger Pancro 400
 
-Grades: Teal & Orange, Bleach Bypass, Golden Hour, Blue Hour, Day for Night, Neon Noir, Technicolor, Technicolor 2-Strip, 70s Faded, Super 8, Matrix Green, Pastel Symmetry, Desert
+**Kodak (42)**
+BW400CN, ColorPlus 200, Ektachrome 100VS, Ektachrome E100GX, Ektar 100, Elite 100 X-Pro, Elite Chrome 200, Elite Chrome 400, Elite Color 200, Elite Color 400, Elite Extracolor 100, Gold 200, Gold 200 Warm, HIE Infrared, Kodachrome 25, Kodachrome 64, Kodachrome 200, Portra 160, Portra 160 NC, Portra 160 VC, Portra 400, Portra 400 NC, Portra 400 UC, Portra 400 VC, Portra 800, Portra 800 HC, T-Max 100, T-Max 400, T-Max 3200, Tri-X 400, Ultramax 400, Gold 100, Gold 400, Pro Image 100, Ektachrome E100, Ektachrome Panther 100, Ektachrome Elite 100, Vericolor III, Aerochrome (false colour infrared), Plus-X 125, Panatomic-X, Technical Pan
+
+**Fujifilm (63)**
+160C, 800Z, Astia 100, Astia 100F, C200, FP-100C, FP-100C Cool, FP-100C Negative, FP-100C Slide, FP-3000B, FP-3000B HC, FP-3000B Negative, FP-3000B Negative Early, Neopan 1600, Neopan Acros 100, Pro 400H, Provia 100, Provia 100F, Provia 400F, Provia 400X, Sensia 100, Superia 100, Superia 200, Superia 200 X-Pro, Superia 400, Superia 800, Superia 1600, Superia HG 1600, Superia Reala 100, Superia X-TRA 400, Superia X-TRA 800, Velvia 50, Velvia 100, Velvia 100F, Velvia 50 Medium Format, Provia 100F Medium Format, Velvia 100F Medium Format, Velvia 50 Polarised, Fortia SP, Natura 1600, Pro 160NS, Industrial 100, Fujicolor 100, Fujicolor HR 100, plus the X-Trans film simulations: Acros, Acros + G, Acros + R, Acros + Ye, Astia, Classic Chrome, Classic Neg, Nostalgic Neg, Eterna, Reala Ace, Mono, Mono + G, Mono + R, Mono + Ye, Pro Neg Hi, Pro Neg Std, Provia, Sepia, Velvia
+
+**Cine (53)**
+Motion picture stocks: CineStill 800T, 800T Cool, 800T Pushed, 50D, 400D, BwXX and Redrum 200, Kodak Vision3 50D, 250D, 200T, 500T and 500T Pushed, Eastman 5247 and 5254, Kodak Vision2 200T 5217 and 500T 5218, Kodak Vision 500T 5279, Kodak EXR 5248, Kodak Ektachrome 100D 7294, Eastman Double-X 5222, Kodak Tri-X Reversal 7266, ORWO UN54, Fuji Eterna 250D and 500T, Fuji Eterna Vivid 160, Fuji Reala 500D, Fuji Eterna Bleach Bypass, Kodak Ektar 100, Kodachrome 64, Kodachrome 200 and Kodachrome 40 Super 8
+
+Grades: Teal & Orange, Bleach Bypass, Golden Hour, Blue Hour, Day for Night, Neon Noir, Technicolor, Technicolor 2-Strip, 70s Faded, Super 8, Matrix Green, Pastel Symmetry, Desert, Nordic Noir, Hong Kong Neon, Paris Gold, Silver Screen
 
 Cinema print films: Kodak 2383, Kodak 2393, Kodak 2302 B&W, Fuji 3510 and Fuji 3513
 
-The motion picture stocks without a LUT are designed from each film's known character, so treat them as a take on the look rather than a lab-measured match.
+**Spektrafilm (22)**
+Portra 160, Portra 400, Portra 800, Portra 800 Push 1, Portra 800 Push 2, Gold 200, Ultramax 400, Ektar 100, Fuji C200, Fuji Pro 400H, Fuji X-TRA 400, Provia 100F, Velvia 100, Ektachrome 100, Kodachrome 64, Vision3 50D, 250D, 200T and 500T on Kodak 2383 print film, Vision3 250D and 500T on Kodak 2393, Verita 200D on 2383
 
-For landscapes try Velvia 50, Provia 100F or Ektar 100. For night shots with CineStill 800T, set white balance to Tungsten or around 3200K.
+These come from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea Volpato, which simulates each film from the manufacturer's published data: how the colour layers respond to light, the dyes, and then the print paper or cinema print film it would be printed on. Slide films are shown as the slide itself. They sit in their own section so you can compare them with the other versions of the same stocks.
+
+Two things to know. The camera can only do a tone curve and a colour mix, so these are the closest it can get to each simulation, not the simulation itself, and they are all rated ★☆☆. And film simulations are made for a flat, unprocessed picture, so on the camera's already finished picture they are contrasty with deep shadows. Turn Strength down if it's too much.
+
+**Moods (6)**
+Pastel Sky, Pastel Portrait, Airy Blue, Lilac Dusk, Nordic Night, Deep Sky
+
+The looks marked ◆ have no LUT behind them. They are designed from each film's known character, so treat them as a take on the look rather than a lab-measured match.
+
+For landscapes try Velvia 50, Provia 100F or Ektar 100. For the deep violet blue skies of slide film on medium format, try Velvia 50 Medium Format, Provia 100F Medium Format, Velvia 100F Medium Format or Deep Sky. For night shots with CineStill 800T, set white balance to Tungsten or around 3200K.
 
 ## Cameras
 
@@ -121,8 +160,8 @@ To remove the app, use **MENU > Application > Application Management** on the ca
 | Control | What it does |
 |---|---|
 | Mode dial | P, A, S or M |
-| Rear dial | Shutter speed in S and M, exposure compensation in P and A |
-| Front dial | ISO |
+| Rear dial | Shutter speed in S and M, exposure compensation in P and A. Can be changed in the Fn menu |
+| Front dial | ISO. Can be changed in the Fn menu |
 | Exposure comp dial | Exposure compensation |
 | Control wheel (turn) | Next or previous film |
 | Fn | Open or close the menu (see below) |
@@ -132,27 +171,31 @@ To remove the app, use **MENU > Application > Application Management** on the ca
 | C2 | Strength 100, 75, 50, 25%. In the menu, adds or removes the highlighted film from Favourites |
 | Up or DISP | Hide or show the info on screen |
 | MOVIE | Start and stop recording |
-| Play | Review photos. Left and right to browse, Play again to go back. If a photo has a developed copy it is shown instead, and C1 flips to the original |
+| Play | Review photos. Left and right to browse, Play again to go back. If a photo has a developed copy it is shown instead, and C1 flips to the original. Up and down try films on the photo (see Darkroom) |
 | MENU | Leave the app |
 
 ### The Fn menu
 
-Up and down pick a row, left and right (or the control wheel) change it. The look updates live as you scroll.
+Up and down pick a row, left and right (or the control wheel) change it. The look updates live as you scroll. The menu shows a few rows at a time and is see-through, so you can watch the picture change.
 
 | Row | What it changes |
 |---|---|
-| Brand | Favourites, My LUTs, Polaroid, Ilford, Kodak, Fujifilm, Cine |
+| Brand | Favourites, My LUTs, Polaroid, Ilford, Agfa, Rollei, More film, Kodak, Fujifilm, Cine, Spektrafilm, Moods |
 | Film | The film within that brand. Delete turns the film off |
 | Strength | 0 to 100% in 5% steps |
 | WB | Auto, Daylight, Shade, Cloudy, Tungsten, fluorescent types, Flash, Kelvin |
 | Kelvin | 100K steps, switches WB to Kelvin |
 | D-Range | Sony's D-Range Optimizer: Off, Auto or levels 1 to 5. Keeps more highlight and shadow detail, in photos and video |
 | Halation | Off or On |
-| Grain | Off, Fine, Medium, Heavy or Coarse |
+| Grain | Off, Fine, Medium, Heavy, Coarse or Auto. Auto picks the level from the film's speed, so Portra 160 gets fine grain and Delta 3200 gets coarse |
 | Light leak | Off or On |
 | Copy size | Small (1500 px wide, quick) or Large (3000 px wide, takes a minute or two) |
+| Front dial | Default (ISO), Aperture, Shutter speed, ISO, Exposure comp or Film |
+| Rear dial | Default (shutter speed in S and M, exposure comp in P and A), Aperture, Shutter speed, ISO, Exposure comp or Film |
 
 Press Fn, centre or MENU to close it. Half pressing the shutter closes it too.
+
+Aperture control needs a lens the camera can control electronically. With a manual or adapted lens you set the aperture on the lens as usual, and the F number isn't shown.
 
 ## Good to know
 
@@ -193,6 +236,8 @@ javac -d build src/com/filmsim/tools/*.java
 java -cp build com.filmsim.tools.ConvertFilms films.csv /path/to/FilmCamera/app/src/main/res/raw ../app/assets
 ```
 
+The Spektrafilm entries need LUTs baked with spektrafilm itself. Clone it, install its Python packages, run `tools/spektrafilm/bake.py` from its folder (the script's first lines say how), and pass the output folder to ConvertFilms as a fourth argument. The `|photo` at the end of those lines in `films.csv` makes the fit favour the colours real photos are made of.
+
 To see what the looks do before putting them on the camera, render a contact sheet, optionally on one of your own photos:
 
 ```
@@ -203,7 +248,8 @@ java -cp build com.filmsim.tools.Preview ../app/assets Cine sheet.png [photo.jpg
 
 - [Sony-PMCA-RE](https://github.com/ma1co/Sony-PMCA-RE) and [OpenMemories-Framework](https://github.com/ma1co/OpenMemories-Framework) by ma1co, for making custom apps on these cameras possible
 - [OpenMemoriesLUT](https://github.com/Pichuworks/OpenMemoriesLUT) by Pichuworks, which showed the curve and matrix trick on the A6000. The LUT conversion code in `tools/` comes from it (MIT, see `tools/LICENSE-OpenMemoriesLUT.txt`)
-- The film LUTs come from [FilmCamera](https://github.com/jegly/FilmCamera), which uses the [Film-Luts](https://github.com/YahiaAngelo/Film-Luts) collection
+- The Spektrafilm section is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea Volpato. Its film profiles and the LUTs made from them are licensed [CC BY-SA 4.0](https://github.com/andreavolpato/spektrafilm/blob/main/SPEKTRAFILM_LICENSE.txt), and so are the looks in this app that were made from them. They were modified for this app by jegly: exposure set for a normal camera picture, slide films scanned instead of printed, white scaled to display white, then fitted to the camera's tone curve and colour matrix. A copy of the licence is in `app/assets/SPEKTRAFILM_LICENSE.txt`
+- The other film LUTs come from [FilmCamera](https://github.com/jegly/FilmCamera), which uses the [Film-Luts](https://github.com/YahiaAngelo/Film-Luts) collection
 
 ## Disclaimer
 

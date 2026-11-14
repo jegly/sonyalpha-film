@@ -9,12 +9,13 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 /**
- * Converts the film LUTs listed in films.csv (file|name|brand|type) into the camera's tone curve + colour matrix
+ * Converts the film LUTs listed in films.csv (file|name|brand|type, plus an optional |photo) into the camera's tone curve + colour matrix
  * and writes them as app assets.
  *
  * Entries whose file is "design:<id>" are built by {@link Designer} instead of read from a LUT.
  *
- * Usage: ConvertFilms <films.csv> <lut dir> <assets dir>
+ * Usage: ConvertFilms <films.csv> <lut dir> <assets dir> [more lut dirs...]
+ * A LUT is looked for in <lut dir> first, then in each extra folder.
  * Output: <assets>/films/NN.bin (LutParams format) and <assets>/films.txt (file|name|brand|type|error).
  */
 public class ConvertFilms {
@@ -44,8 +45,10 @@ public class ConvertFilms {
                     err = -1;
                 } else {
                     File lut = new File(lutDir, f[0]);
+                    for (int d = 3; d < args.length && !lut.isFile(); d++) lut = new File(args[d], f[0]);
                     Cube cube = f[0].endsWith(".png") ? loadHald(lut) : Cube.load(lut);
-                    p = Decomposer.decompose(cube);
+                    // an optional fifth field "photo" fits everyday colours more closely (see Decomposer)
+                    p = Decomposer.decompose(cube, f.length > 4 && f[4].trim().equals("photo"));
                     err = meanError(cube, p);
                 }
                 String file = String.format("%02d.bin", n++);

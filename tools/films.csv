@@ -1,6 +1,6 @@
 # LUT file (from FilmCamera res/raw) or design:<id> (tools Designer) | name shown on the camera | brand | type
 # LUT entries: one per film, using the variant that converts most accurately to the camera's curve + matrix.
-# Brand order: Polaroid, Ilford, Kodak, Fujifilm, then Cine (designed looks first, then cinema prints).
+# Brand order: Polaroid, Ilford, Agfa, Rollei, More film, Kodak, Fujifilm, Cine (designed looks, then cinema prints), Spektrafilm, then Moods.
 lut_bw_polaroid_664.cube|664|Polaroid|Black & white
 lut_instant_pro_polaroid_665_m.cube|665|Polaroid|Instant
 lut_instant_pro_polaroid_665_negative_p.cube|665 Negative|Polaroid|Instant
@@ -31,6 +31,28 @@ lut_bw_ilford_hp_5_plus_400.cube|HP5 Plus 400|Ilford|Black & white
 lut_bw_ilford_hps_800.cube|HPS 800|Ilford|Black & white
 lut_bw_ilford_pan_f_plus_50.cube|Pan F Plus 50|Ilford|Black & white
 lut_bw_ilford_xp_2.cube|XP2|Ilford|Black & white
+design:ilford_ortho_plus|Ortho Plus 80|Ilford|Black & white
+design:ilford_sfx_200|SFX 200|Ilford|Black & white
+design:kentmere_400|Kentmere 400|Ilford|Black & white
+lut_bw_agfa_apx_25.cube|APX 25|Agfa|Black & white
+hald_agfa_apx100.png|APX 100|Agfa|Black & white
+lut_colorslide_agfa_precisa_100.cube|Precisa 100|Agfa|Slide
+lut_negative_color_agfa_ultra_color_100.cube|Ultra Color 100|Agfa|Colour
+lut_negative_color_agfa_vista_200.cube|Vista 200|Agfa|Colour
+design:agfa_optima_200|Optima 200|Agfa|Colour
+design:agfa_scala_200x|Scala 200X|Agfa|Black & white
+lut_bw_rollei_ir_400.cube|IR 400|Rollei|Black & white
+hald_rollei_ortho25.png|Ortho 25|Rollei|Black & white
+lut_bw_rollei_retro_100_tonal.cube|Retro 100 Tonal|Rollei|Black & white
+lut_bw_rollei_retro_80s.cube|Retro 80S|Rollei|Black & white
+design:harman_phoenix_200|Harman Phoenix 200|More film|Colour
+design:orwo_nc500|ORWO Wolfen NC500|More film|Colour
+design:adox_color_mission|Adox Color Mission 200|More film|Colour
+design:fomapan_100|Fomapan 100|More film|Black & white
+design:fomapan_400|Fomapan 400|More film|Black & white
+design:adox_cms_20|Adox CMS 20|More film|Black & white
+design:jch_streetpan_400|JCH StreetPan 400|More film|Black & white
+design:bergger_pancro_400|Bergger Pancro 400|More film|Black & white
 lut_bw_kodak_bw_400_cn.cube|BW400CN|Kodak|Black & white
 design:kodak_colorplus_200|ColorPlus 200|Kodak|Colour
 lut_colorslide_kodak_ektachrome_100_vs_generic.cube|Ektachrome 100VS|Kodak|Slide
@@ -62,6 +84,17 @@ lut_negative_new_kodak_tmax_3200_pp.cube|T-Max 3200|Kodak|Colour
 lut_bw_kodak_t_mmax_400.cube|T-Max 400|Kodak|Black & white
 lut_negative_new_kodak_tri_mx_400_alt.cube|Tri-X 400|Kodak|Colour
 design:kodak_ultramax_400|Ultramax 400|Kodak|Colour
+design:kodak_gold_100|Gold 100|Kodak|Colour
+design:kodak_gold_400|Gold 400|Kodak|Colour
+design:kodak_pro_image_100|Pro Image 100|Kodak|Colour
+design:kodak_e100|Ektachrome E100|Kodak|Slide
+design:ektachrome_panther_100|Ektachrome Panther 100|Kodak|Slide
+design:ektachrome_elite_100|Ektachrome Elite 100|Kodak|Slide
+design:kodak_vericolor_iii|Vericolor III|Kodak|Colour
+design:kodak_aerochrome|Aerochrome|Kodak|Infrared
+design:kodak_plus_x|Plus-X 125|Kodak|Black & white
+design:kodak_panatomic_x|Panatomic-X|Kodak|Black & white
+design:kodak_technical_pan|Technical Pan|Kodak|Black & white
 lut_negative_new_fuji_160c_m.cube|160C|Fujifilm|Colour
 lut_negative_new_fuji_800z_m.cube|800Z|Fujifilm|Colour
 lut_colorslide_fuji_astia_100_generic.cube|Astia 100|Fujifilm|Slide
@@ -110,6 +143,21 @@ lut_fujixtransiii_fuji_xtrans_iii_pro_neg_std.cube|X-Trans Pro Neg Std|Fujifilm|
 lut_fujixtransiii_fuji_xtrans_iii_provia.cube|X-Trans Provia|Fujifilm|Colour
 lut_fujixtransiii_fuji_xtrans_iii_sepia.cube|X-Trans Sepia|Fujifilm|Black & white
 lut_fujixtransiii_fuji_xtrans_iii_velvia.cube|X-Trans Velvia|Fujifilm|Colour
+design:fuji_velvia_100f|Velvia 100F|Fujifilm|Slide
+design:velvia_50_120|Velvia 50 Medium Format|Fujifilm|Slide
+design:provia_100f_120|Provia 100F Medium Format|Fujifilm|Slide
+design:velvia_100f_120|Velvia 100F Medium Format|Fujifilm|Slide
+design:velvia_polarised|Velvia 50 Polarised|Fujifilm|Slide
+design:fuji_fortia_sp|Fortia SP|Fujifilm|Slide
+design:fuji_natura_1600|Natura 1600|Fujifilm|Colour
+design:fuji_pro_160ns|Pro 160NS|Fujifilm|Colour
+design:fuji_industrial_100|Industrial 100|Fujifilm|Colour
+design:fujicolor_100|Fujicolor 100|Fujifilm|Colour
+design:fujicolor_hr_100|Fujicolor HR 100|Fujifilm|Colour
+design:xtrans_classic_neg|X-Trans Classic Neg|Fujifilm|Colour
+design:xtrans_nostalgic_neg|X-Trans Nostalgic Neg|Fujifilm|Colour
+design:xtrans_eterna|X-Trans Eterna|Fujifilm|Colour
+design:xtrans_reala_ace|X-Trans Reala Ace|Fujifilm|Colour
 design:cinestill_800t|CineStill 800T|Cine|Cine
 design:cinestill_800t_cool|CineStill 800T Cool|Cine|Cine
 design:cinestill_50d|CineStill 50D|Cine|Cine
@@ -154,3 +202,41 @@ lut_print_fuji_3513_constlmap.cube|Fuji 3513 Print|Cine|Cinema print
 lut_print_kodak_2383_constlmap.cube|Kodak 2383 Print|Cine|Cinema print
 lut_print_kodak_2393_constlmap.cube|Kodak 2393 Print|Cine|Cinema print
 design:kodak_2302|Kodak 2302 B&W Print|Cine|Cine
+design:cinestill_800t_push|CineStill 800T Pushed|Cine|Cine
+design:cinestill_redrum|CineStill Redrum 200|Cine|Cine
+design:vision3_500t_push|Kodak Vision3 500T Pushed|Cine|Cine
+design:eastman_5247|Eastman 5247|Cine|Cine
+design:eastman_5254|Eastman 5254|Cine|Cine
+design:nordic_noir|Nordic Noir|Cine|Cine
+design:hong_kong_neon|Hong Kong Neon|Cine|Cine
+design:paris_gold|Paris Gold|Cine|Cine
+design:silver_screen|Silver Screen|Cine|Black & white
+# Spektrafilm brand: LUTs baked by tools/spektrafilm/bake.py from spektrafilm by Andrea Volpato (CC BY-SA 4.0).
+spk_portra_160.cube|Portra 160|Spektrafilm|Colour|photo
+spk_portra_400.cube|Portra 400|Spektrafilm|Colour|photo
+spk_portra_800.cube|Portra 800|Spektrafilm|Colour|photo
+spk_portra_800_push1.cube|Portra 800 Push 1|Spektrafilm|Colour|photo
+spk_portra_800_push2.cube|Portra 800 Push 2|Spektrafilm|Colour|photo
+spk_gold_200.cube|Gold 200|Spektrafilm|Colour|photo
+spk_ultramax_400.cube|Ultramax 400|Spektrafilm|Colour|photo
+spk_ektar_100.cube|Ektar 100|Spektrafilm|Colour|photo
+spk_fuji_c200.cube|Fuji C200|Spektrafilm|Colour|photo
+spk_fuji_pro_400h.cube|Fuji Pro 400H|Spektrafilm|Colour|photo
+spk_fuji_xtra_400.cube|Fuji X-TRA 400|Spektrafilm|Colour|photo
+spk_provia_100f.cube|Provia 100F|Spektrafilm|Slide|photo
+spk_velvia_100.cube|Velvia 100|Spektrafilm|Slide|photo
+spk_ektachrome_100.cube|Ektachrome 100|Spektrafilm|Slide|photo
+spk_kodachrome_64.cube|Kodachrome 64|Spektrafilm|Slide|photo
+spk_vision3_50d_2383.cube|Vision3 50D on 2383|Spektrafilm|Cine|photo
+spk_vision3_250d_2383.cube|Vision3 250D on 2383|Spektrafilm|Cine|photo
+spk_vision3_200t_2383.cube|Vision3 200T on 2383|Spektrafilm|Cine|photo
+spk_vision3_500t_2383.cube|Vision3 500T on 2383|Spektrafilm|Cine|photo
+spk_vision3_250d_2393.cube|Vision3 250D on 2393|Spektrafilm|Cine|photo
+spk_vision3_500t_2393.cube|Vision3 500T on 2393|Spektrafilm|Cine|photo
+spk_verita_200d_2383.cube|Verita 200D on 2383|Spektrafilm|Cine|photo
+design:pastel_sky|Pastel Sky|Moods|Colour
+design:pastel_portrait|Pastel Portrait|Moods|Colour
+design:airy_blue|Airy Blue|Moods|Colour
+design:lilac_dusk|Lilac Dusk|Moods|Colour
+design:nordic_night|Nordic Night|Moods|Colour
+design:deep_sky|Deep Sky|Moods|Colour
