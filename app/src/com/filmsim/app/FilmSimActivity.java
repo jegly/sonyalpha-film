@@ -115,6 +115,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
     /** These looks come from spektrafilm's film models; its licence asks for this credit wherever they are used. */
     private static final String SPEKTRAFILM = "Spektrafilm";
     private static final String SPEKTRAFILM_CREDIT = "Derived from spektrafilm by Andrea Volpato, CC BY-SA 4.0";
+    private static final String DEVELOP = "Develop";
+    private static final String DEVELOP_CREDIT = "From Develop's film engine, after spektrafilm by Andrea Volpato, CC BY-SA 4.0";
     private boolean menuOpen;
     private int menuRow = ROW_FILM;
     private final Set<String> favourites = new LinkedHashSet<String>();
@@ -749,6 +751,8 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         refreshFilmBar();
         if (f != null && SPEKTRAFILM.equals(f.brand) && !menuOpen) {
             showMessage(SPEKTRAFILM_CREDIT);
+        } else if (f != null && DEVELOP.equals(f.brand) && !menuOpen) {
+            showMessage(DEVELOP_CREDIT);
         } else if (f != null && f.name.contains("800T")) {
             showMessage("Tip: Tungsten or ~3200K WB (right button) for night");
         }
@@ -1058,6 +1062,7 @@ public class FilmSimActivity extends Activity implements SurfaceHolder.Callback,
         }
         sb.append(menuRow + 1).append('/').append(MENU_ROWS.length).append("  up/down: row   left/right: change   Fn: close");
         if ((menuRow == ROW_FILM || menuRow == ROW_BRAND) && SPEKTRAFILM.equals(brand)) sb.append("\n").append(SPEKTRAFILM_CREDIT);
+        else if ((menuRow == ROW_FILM || menuRow == ROW_BRAND) && DEVELOP.equals(brand)) sb.append("\n").append(DEVELOP_CREDIT);
         else if (menuRow == ROW_FILM) sb.append("\nC2: favourite   Delete: no film");
         else if (menuRow >= ROW_HALATION && menuRow <= ROW_SIZE) sb.append("\nAdded after the shot to a copy in FILMSIM/DEV");
         else if (menuRow == ROW_FRONT || menuRow == ROW_REAR) sb.append("\nAperture needs a lens the camera can control");

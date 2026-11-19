@@ -11,7 +11,7 @@ You choose a film, the screen shows it in real time, and your JPEGs and videos c
 
 ## What it does
 
-- 238 film looks across Polaroid, Ilford, Agfa, Rollei, Kodak, Fujifilm, a Cine section, a Spektrafilm section and a few Moods
+- 359 film looks across Polaroid, Ilford, Agfa, Rollei, Kodak, Fujifilm, a Cine section, a Spektrafilm section, a few Moods and a Develop section
 - Live preview of the look in the viewfinder and on the screen
 - The look is saved into your JPEGs and videos
 - Strength control from 0 to 100% for every look
@@ -126,6 +126,18 @@ The looks marked ◆ have no LUT behind them. They are designed from each film's
 
 For landscapes try Velvia 50, Provia 100F or Ektar 100. For the deep violet blue skies of slide film on medium format, try Velvia 50 Medium Format, Provia 100F Medium Format, Velvia 100F Medium Format or Deep Sky. For night shots with CineStill 800T, set white balance to Tungsten or around 3200K.
 
+
+**Develop (121)**
+CineStill: 800T
+
+Fujifilm: 200, 400, 64T Type II, Astia 100F, C200, Eterna 250, Eterna 250D, Eterna 400, Eterna 500, Eterna Vivid 160, F-64D, NPL 160, Neopan 100 Acros II, Neopan 1600, Neopan 400, Nexia 400, Nexia 800, Nexia A200, Pro 160C, Pro 160S, Pro 400H, Pro 800Z, Provia 100F, Provia 400F, Reala 500D, Sensia 100, Sensia 200, Sensia 400, Superia 100, Superia 1600, Superia 200, Superia Reala, Superia X-TRA 800, True Definition 400, Velvia 100, Velvia 100F, Velvia 50, X-Tra 400
+
+Ilford: Delta 100, Delta 3200, Delta 400, FP4 Plus 125, HP5 Plus 400, Ortho Plus 80, Pan F Plus 50, SFX 200, XP2 Super 400
+
+Kodak: Double-X 5222, Ektachrome 100, Ektachrome 100 #2, Ektachrome 100 Plus, Ektachrome 100D 7294, Ektachrome 160T, Ektachrome 320T, Ektachrome 400X, Ektachrome 64, Ektachrome 64T, Ektachrome E100G, Ektachrome E100VS, Ektachrome E200, Ektachrome P1600, Ektapress PJ100, Ektapress PJ800, Ektar 100, Elite Chrome 200, Elite Chrome 400, Elite Chrome Extra Color 100, Gold 200, High Definition 200, High Definition 400, Kodachrome 200, Kodachrome 25, Kodachrome 64, Plus-X 125, Portra 100T, Portra 160, Portra 160NC, Portra 160VC, Portra 400, Portra 400NC, Portra 400VC, Portra 800, Portra 800 (Push 1), Portra 800 (Push 2), Pro 100, Pro 400 MC, Pro Image 100, Profoto 100, Royal Gold 100, Royal Gold 200, Royal Gold 400, Royal Supra 200, Royal Supra 400, Supra 200, Supra 400, T-Max 100, T-Max 400, T-Max P3200, Tri-X 400, Ultra Color 100UC, Ultra Color 400UC, Ultramax 400, Vericolor III, Verita 200D, Vision 200T, Vision 250D, Vision 320T, Vision 500T, Vision 500T (5263), Vision 800T, Vision2 100T, Vision2 200T, Vision2 250D, Vision2 500T, Vision2 50D, Vision2 Expression 500T, Vision3 200T, Vision3 250D, Vision3 500T, Vision3 50D
+
+These come from [Develop](https://github.com/jegly/Develop), a Linux film darkroom built on spektrafilm. Each film is developed the way Develop develops it by default: colour negatives printed on their colour paper, cine negatives on Kodak 2383, black and white films on Ilford Multigrade, slides shown as the slide itself. Besides spektrafilm's own films, Develop has 93 more, most of them long discontinued, rebuilt from the curves in the makers' published data sheets. Kodak Ektachrome 100 #2 is a second version of Ektachrome 100, built from Kodak's sheet. The same two things apply as for Spektrafilm: these are the camera's closest curve and colour mix to each film, and they were softened for the camera's already finished picture in the same way.
+
 ## Cameras
 
 Tested on the Sony A7 II (ILCE-7M2) with firmware 4.01.
@@ -180,7 +192,7 @@ Up and down pick a row, left and right (or the control wheel) change it. The loo
 
 | Row | What it changes |
 |---|---|
-| Brand | Favourites, My LUTs, Polaroid, Ilford, Agfa, Rollei, More film, Kodak, Fujifilm, Cine, Spektrafilm, Moods |
+| Brand | Favourites, My LUTs, Polaroid, Ilford, Agfa, Rollei, More film, Kodak, Fujifilm, Cine, Spektrafilm, Moods, Develop |
 | Film | The film within that brand. Delete turns the film off |
 | Strength | 0 to 100% in 5% steps |
 | WB | Auto, Daylight, Shade, Cloudy, Tungsten, fluorescent types, Flash, Kelvin |
@@ -236,6 +248,8 @@ javac -d build src/com/filmsim/tools/*.java
 java -cp build com.filmsim.tools.ConvertFilms films.csv /path/to/FilmCamera/app/src/main/res/raw ../app/assets
 ```
 
+The Develop entries are baked with Develop's own engine: build [Develop](https://github.com/jegly/Develop) (`engine/build-linux.sh`), run `DEVELOP_ROOT=/path/to/Develop python3 tools/develop/bake.py <folder>` with a Python that has numpy, and pass that folder to ConvertFilms as one more argument.
+
 The Spektrafilm entries need LUTs baked with spektrafilm itself. Clone it, install its Python packages, run `tools/spektrafilm/bake.py` from its folder (the script's first lines say how), and pass the output folder to ConvertFilms as a fourth argument. The `|photo` at the end of those lines in `films.csv` makes the fit favour the colours real photos are made of.
 
 To see what the looks do before putting them on the camera, render a contact sheet, optionally on one of your own photos:
@@ -249,6 +263,7 @@ java -cp build com.filmsim.tools.Preview ../app/assets Cine sheet.png [photo.jpg
 - [Sony-PMCA-RE](https://github.com/ma1co/Sony-PMCA-RE) and [OpenMemories-Framework](https://github.com/ma1co/OpenMemories-Framework) by ma1co, for making custom apps on these cameras possible
 - [OpenMemoriesLUT](https://github.com/Pichuworks/OpenMemoriesLUT) by Pichuworks, which showed the curve and matrix trick on the A6000. The LUT conversion code in `tools/` comes from it (MIT, see `tools/LICENSE-OpenMemoriesLUT.txt`)
 - The Spektrafilm section is derived from [spektrafilm](https://github.com/andreavolpato/spektrafilm) by Andrea Volpato. Its film profiles and the LUTs made from them are licensed [CC BY-SA 4.0](https://github.com/andreavolpato/spektrafilm/blob/main/SPEKTRAFILM_LICENSE.txt), and so are the looks in this app that were made from them. They were modified for this app by jegly: exposure set for a normal camera picture, slide films scanned instead of printed, white scaled to display white, then fitted to the camera's tone curve and colour matrix. A copy of the licence is in `app/assets/SPEKTRAFILM_LICENSE.txt`
+- The Develop section is made with [Develop](https://github.com/jegly/Develop)'s engine, which is derived from SpektraLab and from spektrafilm by Andrea Volpato. The looks made from spektrafilm's own film profiles are licensed [CC BY-SA 4.0](https://github.com/andreavolpato/spektrafilm/blob/main/SPEKTRAFILM_LICENSE.txt), like the Spektrafilm section; the others come from SpektraLab's and Develop's own profiles (GPL-3.0). All were modified for this app by jegly in the same ways as the Spektrafilm section
 - The other film LUTs come from [FilmCamera](https://github.com/jegly/FilmCamera), which uses the [Film-Luts](https://github.com/YahiaAngelo/Film-Luts) collection
 
 ## Disclaimer

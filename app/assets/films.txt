@@ -236,3 +236,124 @@
 235.bin|Lilac Dusk|Moods|Colour|-1.0
 236.bin|Nordic Night|Moods|Colour|-1.0
 237.bin|Deep Sky|Moods|Colour|-1.0
+238.bin|CineStill 800T|Develop|Colour|9.8
+239.bin|Fujifilm 200|Develop|Colour|12.1
+240.bin|Fujifilm 400|Develop|Colour|12.4
+241.bin|Fujifilm 64T Type II|Develop|Slide|9.0
+242.bin|Fujifilm Astia 100F|Develop|Slide|9.5
+243.bin|Fujifilm C200|Develop|Colour|12.1
+244.bin|Fujifilm Eterna 250|Develop|Cine|12.1
+245.bin|Fujifilm Eterna 250D|Develop|Cine|11.3
+246.bin|Fujifilm Eterna 400|Develop|Cine|9.4
+247.bin|Fujifilm Eterna 500|Develop|Cine|11.5
+248.bin|Fujifilm Eterna Vivid 160|Develop|Cine|10.2
+249.bin|Fujifilm F-64D|Develop|Cine|11.1
+250.bin|Fujifilm NPL 160|Develop|Colour|13.7
+251.bin|Fujifilm Neopan 100 Acros II|Develop|Black & white|14.8
+252.bin|Fujifilm Neopan 1600|Develop|Black & white|20.5
+253.bin|Fujifilm Neopan 400|Develop|Black & white|15.3
+254.bin|Fujifilm Nexia 400|Develop|Colour|15.3
+255.bin|Fujifilm Nexia 800|Develop|Colour|20.0
+256.bin|Fujifilm Nexia A200|Develop|Colour|15.1
+257.bin|Fujifilm Pro 160C|Develop|Colour|13.5
+258.bin|Fujifilm Pro 160S|Develop|Colour|10.9
+259.bin|Fujifilm Pro 400H|Develop|Colour|10.1
+260.bin|Fujifilm Pro 800Z|Develop|Colour|13.0
+261.bin|Fujifilm Provia 100F|Develop|Slide|8.6
+262.bin|Fujifilm Provia 400F|Develop|Slide|8.0
+263.bin|Fujifilm Reala 500D|Develop|Cine|10.5
+264.bin|Fujifilm Sensia 100|Develop|Slide|9.3
+265.bin|Fujifilm Sensia 200|Develop|Slide|8.5
+266.bin|Fujifilm Sensia 400|Develop|Slide|9.6
+267.bin|Fujifilm Superia 100|Develop|Colour|17.9
+268.bin|Fujifilm Superia 1600|Develop|Colour|16.3
+269.bin|Fujifilm Superia 200|Develop|Colour|17.1
+270.bin|Fujifilm Superia Reala|Develop|Colour|14.8
+271.bin|Fujifilm Superia X-TRA 800|Develop|Colour|17.7
+272.bin|Fujifilm True Definition 400|Develop|Colour|8.5
+273.bin|Fujifilm Velvia 100|Develop|Slide|10.2
+274.bin|Fujifilm Velvia 100F|Develop|Slide|10.0
+275.bin|Fujifilm Velvia 50|Develop|Slide|9.4
+276.bin|Fujifilm X-Tra 400|Develop|Colour|13.5
+277.bin|Ilford Delta 100|Develop|Black & white|15.7
+278.bin|Ilford Delta 3200|Develop|Black & white|16.4
+279.bin|Ilford Delta 400|Develop|Black & white|16.8
+280.bin|Ilford FP4 Plus 125|Develop|Black & white|15.4
+281.bin|Ilford HP5 Plus 400|Develop|Black & white|14.8
+282.bin|Ilford Ortho Plus 80|Develop|Black & white|17.6
+283.bin|Ilford Pan F Plus 50|Develop|Black & white|15.6
+284.bin|Ilford SFX 200|Develop|Black & white|18.9
+285.bin|Ilford XP2 Super 400|Develop|Black & white|15.9
+286.bin|Kodak Double-X 5222|Develop|Black & white|15.8
+287.bin|Kodak Ektachrome 100|Develop|Slide|8.2
+288.bin|Kodak Ektachrome 100 #2|Develop|Slide|8.4
+289.bin|Kodak Ektachrome 100 Plus|Develop|Slide|9.9
+290.bin|Kodak Ektachrome 100D 7294|Develop|Slide|8.4
+291.bin|Kodak Ektachrome 160T|Develop|Slide|9.3
+292.bin|Kodak Ektachrome 320T|Develop|Slide|9.5
+293.bin|Kodak Ektachrome 400X|Develop|Slide|9.4
+294.bin|Kodak Ektachrome 64|Develop|Slide|9.1
+295.bin|Kodak Ektachrome 64T|Develop|Slide|8.4
+296.bin|Kodak Ektachrome E100G|Develop|Slide|8.4
+297.bin|Kodak Ektachrome E100VS|Develop|Slide|8.8
+298.bin|Kodak Ektachrome E200|Develop|Slide|8.7
+299.bin|Kodak Ektachrome P1600|Develop|Slide|12.0
+300.bin|Kodak Ektapress PJ100|Develop|Colour|12.9
+301.bin|Kodak Ektapress PJ800|Develop|Colour|14.8
+302.bin|Kodak Ektar 100|Develop|Colour|11.4
+303.bin|Kodak Elite Chrome 200|Develop|Slide|8.7
+304.bin|Kodak Elite Chrome 400|Develop|Slide|9.6
+305.bin|Kodak Elite Chrome Extra Color 100|Develop|Slide|8.8
+306.bin|Kodak Gold 200|Develop|Colour|10.5
+307.bin|Kodak High Definition 200|Develop|Colour|12.2
+308.bin|Kodak High Definition 400|Develop|Colour|12.4
+309.bin|Kodak Kodachrome 200|Develop|Slide|8.5
+310.bin|Kodak Kodachrome 25|Develop|Slide|8.1
+311.bin|Kodak Kodachrome 64|Develop|Slide|8.3
+312.bin|Kodak Plus-X 125|Develop|Black & white|14.0
+313.bin|Kodak Portra 100T|Develop|Colour|14.1
+314.bin|Kodak Portra 160|Develop|Colour|10.6
+315.bin|Kodak Portra 160NC|Develop|Colour|10.8
+316.bin|Kodak Portra 160VC|Develop|Colour|12.5
+317.bin|Kodak Portra 400|Develop|Colour|13.2
+318.bin|Kodak Portra 400NC|Develop|Colour|10.8
+319.bin|Kodak Portra 400VC|Develop|Colour|12.5
+320.bin|Kodak Portra 800|Develop|Colour|10.1
+321.bin|Kodak Portra 800 (Push 1)|Develop|Colour|13.3
+322.bin|Kodak Portra 800 (Push 2)|Develop|Colour|15.7
+323.bin|Kodak Pro 100|Develop|Colour|14.7
+324.bin|Kodak Pro 400 MC|Develop|Colour|10.9
+325.bin|Kodak Pro Image 100|Develop|Colour|13.7
+326.bin|Kodak Profoto 100|Develop|Colour|13.6
+327.bin|Kodak Royal Gold 100|Develop|Colour|14.7
+328.bin|Kodak Royal Gold 200|Develop|Colour|13.3
+329.bin|Kodak Royal Gold 400|Develop|Colour|14.5
+330.bin|Kodak Royal Supra 200|Develop|Colour|12.2
+331.bin|Kodak Royal Supra 400|Develop|Colour|12.2
+332.bin|Kodak Supra 200|Develop|Colour|12.2
+333.bin|Kodak Supra 400|Develop|Colour|15.3
+334.bin|Kodak T-Max 100|Develop|Black & white|16.6
+335.bin|Kodak T-Max 400|Develop|Black & white|14.0
+336.bin|Kodak T-Max P3200|Develop|Black & white|14.7
+337.bin|Kodak Tri-X 400|Develop|Black & white|15.5
+338.bin|Kodak Ultra Color 100UC|Develop|Colour|11.3
+339.bin|Kodak Ultra Color 400UC|Develop|Colour|15.4
+340.bin|Kodak Ultramax 400|Develop|Colour|10.3
+341.bin|Kodak Vericolor III|Develop|Colour|12.4
+342.bin|Kodak Verita 200D|Develop|Cine|9.8
+343.bin|Kodak Vision 200T|Develop|Cine|12.3
+344.bin|Kodak Vision 250D|Develop|Cine|11.4
+345.bin|Kodak Vision 320T|Develop|Cine|9.3
+346.bin|Kodak Vision 500T|Develop|Cine|11.9
+347.bin|Kodak Vision 500T (5263)|Develop|Cine|9.1
+348.bin|Kodak Vision 800T|Develop|Cine|11.2
+349.bin|Kodak Vision2 100T|Develop|Cine|11.8
+350.bin|Kodak Vision2 200T|Develop|Cine|11.9
+351.bin|Kodak Vision2 250D|Develop|Cine|10.9
+352.bin|Kodak Vision2 500T|Develop|Cine|9.2
+353.bin|Kodak Vision2 50D|Develop|Cine|7.4
+354.bin|Kodak Vision2 Expression 500T|Develop|Cine|9.9
+355.bin|Kodak Vision3 200T|Develop|Cine|10.5
+356.bin|Kodak Vision3 250D|Develop|Cine|9.6
+357.bin|Kodak Vision3 500T|Develop|Cine|9.8
+358.bin|Kodak Vision3 50D|Develop|Cine|9.8

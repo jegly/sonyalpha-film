@@ -1,6 +1,7 @@
 # LUT file (from FilmCamera res/raw) or design:<id> (tools Designer) | name shown on the camera | brand | type
 # LUT entries: one per film, using the variant that converts most accurately to the camera's curve + matrix.
-# Brand order: Polaroid, Ilford, Agfa, Rollei, More film, Kodak, Fujifilm, Cine (designed looks, then cinema prints), Spektrafilm, then Moods.
+# Brand order: Polaroid, Ilford, Agfa, Rollei, More film, Kodak, Fujifilm, Cine (designed looks, then cinema prints), Spektrafilm, Moods,
+# then Develop (last, so the earlier looks keep their numbers).
 lut_bw_polaroid_664.cube|664|Polaroid|Black & white
 lut_instant_pro_polaroid_665_m.cube|665|Polaroid|Instant
 lut_instant_pro_polaroid_665_negative_p.cube|665 Negative|Polaroid|Instant
@@ -240,3 +241,126 @@ design:airy_blue|Airy Blue|Moods|Colour
 design:lilac_dusk|Lilac Dusk|Moods|Colour
 design:nordic_night|Nordic Night|Moods|Colour
 design:deep_sky|Deep Sky|Moods|Colour
+# Develop brand: LUTs baked by tools/develop/bake.py with Develop's engine (github.com/jegly/Develop), from
+# spektrafilm by Andrea Volpato (CC BY-SA 4.0): its measured films plus 93 rebuilt from makers' data sheets.
+dev_cinestill_800t.cube|CineStill 800T|Develop|Colour|photo
+dev_fujifilm_200.cube|Fujifilm 200|Develop|Colour|photo
+dev_fujifilm_400.cube|Fujifilm 400|Develop|Colour|photo
+dev_fujifilm_64t_type_ii.cube|Fujifilm 64T Type II|Develop|Slide|photo
+dev_fujifilm_astia_100f.cube|Fujifilm Astia 100F|Develop|Slide|photo
+dev_fujifilm_c200.cube|Fujifilm C200|Develop|Colour|photo
+dev_fujifilm_eterna_250.cube|Fujifilm Eterna 250|Develop|Cine|photo
+dev_fujifilm_eterna_250d.cube|Fujifilm Eterna 250D|Develop|Cine|photo
+dev_fujifilm_eterna_400.cube|Fujifilm Eterna 400|Develop|Cine|photo
+dev_fujifilm_eterna_500.cube|Fujifilm Eterna 500|Develop|Cine|photo
+dev_fujifilm_eterna_vivid_160.cube|Fujifilm Eterna Vivid 160|Develop|Cine|photo
+dev_fujifilm_f_64d.cube|Fujifilm F-64D|Develop|Cine|photo
+dev_fujifilm_npl_160.cube|Fujifilm NPL 160|Develop|Colour|photo
+dev_fujifilm_neopan_acros_100_ii.cube|Fujifilm Neopan 100 Acros II|Develop|Black & white|photo
+dev_fujifilm_neopan_1600.cube|Fujifilm Neopan 1600|Develop|Black & white|photo
+dev_fujifilm_neopan_400.cube|Fujifilm Neopan 400|Develop|Black & white|photo
+dev_fujifilm_nexia_400.cube|Fujifilm Nexia 400|Develop|Colour|photo
+dev_fujifilm_nexia_800.cube|Fujifilm Nexia 800|Develop|Colour|photo
+dev_fujifilm_nexia_a200.cube|Fujifilm Nexia A200|Develop|Colour|photo
+dev_fujifilm_pro_160c.cube|Fujifilm Pro 160C|Develop|Colour|photo
+dev_fujifilm_pro_160s.cube|Fujifilm Pro 160S|Develop|Colour|photo
+dev_fujifilm_pro_400h.cube|Fujifilm Pro 400H|Develop|Colour|photo
+dev_fujifilm_pro_800z.cube|Fujifilm Pro 800Z|Develop|Colour|photo
+dev_fujifilm_provia_100f.cube|Fujifilm Provia 100F|Develop|Slide|photo
+dev_fujifilm_provia_400f.cube|Fujifilm Provia 400F|Develop|Slide|photo
+dev_fujifilm_reala_500d.cube|Fujifilm Reala 500D|Develop|Cine|photo
+dev_fujifilm_sensia_100.cube|Fujifilm Sensia 100|Develop|Slide|photo
+dev_fujifilm_sensia_200.cube|Fujifilm Sensia 200|Develop|Slide|photo
+dev_fujifilm_sensia_400.cube|Fujifilm Sensia 400|Develop|Slide|photo
+dev_fujifilm_superia_100.cube|Fujifilm Superia 100|Develop|Colour|photo
+dev_fujifilm_superia_1600.cube|Fujifilm Superia 1600|Develop|Colour|photo
+dev_fujifilm_superia_200.cube|Fujifilm Superia 200|Develop|Colour|photo
+dev_fujifilm_superia_reala.cube|Fujifilm Superia Reala|Develop|Colour|photo
+dev_fujifilm_superia_xtra_800.cube|Fujifilm Superia X-TRA 800|Develop|Colour|photo
+dev_fujifilm_true_definition_400.cube|Fujifilm True Definition 400|Develop|Colour|photo
+dev_fujifilm_velvia_100.cube|Fujifilm Velvia 100|Develop|Slide|photo
+dev_fujifilm_velvia_100f.cube|Fujifilm Velvia 100F|Develop|Slide|photo
+dev_fujifilm_velvia_50.cube|Fujifilm Velvia 50|Develop|Slide|photo
+dev_fujifilm_xtra_400.cube|Fujifilm X-Tra 400|Develop|Colour|photo
+dev_ilford_delta_100.cube|Ilford Delta 100|Develop|Black & white|photo
+dev_ilford_delta_3200.cube|Ilford Delta 3200|Develop|Black & white|photo
+dev_ilford_delta_400.cube|Ilford Delta 400|Develop|Black & white|photo
+dev_ilford_fp4_plus_125.cube|Ilford FP4 Plus 125|Develop|Black & white|photo
+dev_ilford_hp5_plus_400.cube|Ilford HP5 Plus 400|Develop|Black & white|photo
+dev_ilford_ortho_plus_80.cube|Ilford Ortho Plus 80|Develop|Black & white|photo
+dev_ilford_pan_f_plus_50.cube|Ilford Pan F Plus 50|Develop|Black & white|photo
+dev_ilford_sfx_200.cube|Ilford SFX 200|Develop|Black & white|photo
+dev_ilford_xp2_super_400.cube|Ilford XP2 Super 400|Develop|Black & white|photo
+dev_kodak_double_x_5222.cube|Kodak Double-X 5222|Develop|Black & white|photo
+dev_kodak_ektachrome_100.cube|Kodak Ektachrome 100|Develop|Slide|photo
+dev_kodak_ektachrome_e100_2.cube|Kodak Ektachrome 100 #2|Develop|Slide|photo
+dev_kodak_ektachrome_100_plus.cube|Kodak Ektachrome 100 Plus|Develop|Slide|photo
+dev_kodak_ektachrome_100d_7294.cube|Kodak Ektachrome 100D 7294|Develop|Slide|photo
+dev_kodak_ektachrome_160t.cube|Kodak Ektachrome 160T|Develop|Slide|photo
+dev_kodak_ektachrome_320t.cube|Kodak Ektachrome 320T|Develop|Slide|photo
+dev_kodak_ektachrome_400x.cube|Kodak Ektachrome 400X|Develop|Slide|photo
+dev_kodak_ektachrome_64.cube|Kodak Ektachrome 64|Develop|Slide|photo
+dev_kodak_ektachrome_64t.cube|Kodak Ektachrome 64T|Develop|Slide|photo
+dev_kodak_ektachrome_e100g.cube|Kodak Ektachrome E100G|Develop|Slide|photo
+dev_kodak_ektachrome_e100vs.cube|Kodak Ektachrome E100VS|Develop|Slide|photo
+dev_kodak_ektachrome_e200.cube|Kodak Ektachrome E200|Develop|Slide|photo
+dev_kodak_ektachrome_p1600.cube|Kodak Ektachrome P1600|Develop|Slide|photo
+dev_kodak_ektapress_pj100.cube|Kodak Ektapress PJ100|Develop|Colour|photo
+dev_kodak_ektapress_pj800.cube|Kodak Ektapress PJ800|Develop|Colour|photo
+dev_kodak_ektar_100.cube|Kodak Ektar 100|Develop|Colour|photo
+dev_kodak_elite_chrome_200.cube|Kodak Elite Chrome 200|Develop|Slide|photo
+dev_kodak_elite_chrome_400.cube|Kodak Elite Chrome 400|Develop|Slide|photo
+dev_kodak_elite_chrome_extra_color_100.cube|Kodak Elite Chrome Extra Color 100|Develop|Slide|photo
+dev_kodak_gold_200.cube|Kodak Gold 200|Develop|Colour|photo
+dev_kodak_high_definition_200.cube|Kodak High Definition 200|Develop|Colour|photo
+dev_kodak_high_definition_400.cube|Kodak High Definition 400|Develop|Colour|photo
+dev_kodak_kodachrome_200.cube|Kodak Kodachrome 200|Develop|Slide|photo
+dev_kodak_kodachrome_25.cube|Kodak Kodachrome 25|Develop|Slide|photo
+dev_kodak_kodachrome_64.cube|Kodak Kodachrome 64|Develop|Slide|photo
+dev_kodak_plus_x_125.cube|Kodak Plus-X 125|Develop|Black & white|photo
+dev_kodak_portra_100t.cube|Kodak Portra 100T|Develop|Colour|photo
+dev_kodak_portra_160.cube|Kodak Portra 160|Develop|Colour|photo
+dev_kodak_portra_160nc.cube|Kodak Portra 160NC|Develop|Colour|photo
+dev_kodak_portra_160vc.cube|Kodak Portra 160VC|Develop|Colour|photo
+dev_kodak_portra_400.cube|Kodak Portra 400|Develop|Colour|photo
+dev_kodak_portra_400nc.cube|Kodak Portra 400NC|Develop|Colour|photo
+dev_kodak_portra_400vc.cube|Kodak Portra 400VC|Develop|Colour|photo
+dev_kodak_portra_800.cube|Kodak Portra 800|Develop|Colour|photo
+dev_kodak_portra_800_push1.cube|Kodak Portra 800 (Push 1)|Develop|Colour|photo
+dev_kodak_portra_800_push2.cube|Kodak Portra 800 (Push 2)|Develop|Colour|photo
+dev_kodak_pro_100.cube|Kodak Pro 100|Develop|Colour|photo
+dev_kodak_pro_400mc.cube|Kodak Pro 400 MC|Develop|Colour|photo
+dev_kodak_pro_image_100.cube|Kodak Pro Image 100|Develop|Colour|photo
+dev_kodak_profoto_100.cube|Kodak Profoto 100|Develop|Colour|photo
+dev_kodak_royal_gold_100.cube|Kodak Royal Gold 100|Develop|Colour|photo
+dev_kodak_royal_gold_200.cube|Kodak Royal Gold 200|Develop|Colour|photo
+dev_kodak_royal_gold_400.cube|Kodak Royal Gold 400|Develop|Colour|photo
+dev_kodak_royal_supra_200.cube|Kodak Royal Supra 200|Develop|Colour|photo
+dev_kodak_royal_supra_400.cube|Kodak Royal Supra 400|Develop|Colour|photo
+dev_kodak_supra_200.cube|Kodak Supra 200|Develop|Colour|photo
+dev_kodak_supra_400.cube|Kodak Supra 400|Develop|Colour|photo
+dev_kodak_tmax_100.cube|Kodak T-Max 100|Develop|Black & white|photo
+dev_kodak_tmax_400.cube|Kodak T-Max 400|Develop|Black & white|photo
+dev_kodak_tmax_p3200.cube|Kodak T-Max P3200|Develop|Black & white|photo
+dev_kodak_tri_x_400.cube|Kodak Tri-X 400|Develop|Black & white|photo
+dev_kodak_ultra_color_100uc.cube|Kodak Ultra Color 100UC|Develop|Colour|photo
+dev_kodak_ultra_color_400uc.cube|Kodak Ultra Color 400UC|Develop|Colour|photo
+dev_kodak_ultramax_400.cube|Kodak Ultramax 400|Develop|Colour|photo
+dev_kodak_vericolor_iii.cube|Kodak Vericolor III|Develop|Colour|photo
+dev_kodak_verita_200d.cube|Kodak Verita 200D|Develop|Cine|photo
+dev_kodak_vision_200t.cube|Kodak Vision 200T|Develop|Cine|photo
+dev_kodak_vision_250d.cube|Kodak Vision 250D|Develop|Cine|photo
+dev_kodak_vision_320t.cube|Kodak Vision 320T|Develop|Cine|photo
+dev_kodak_vision_500t.cube|Kodak Vision 500T|Develop|Cine|photo
+dev_kodak_vision_500t_5263.cube|Kodak Vision 500T (5263)|Develop|Cine|photo
+dev_kodak_vision_800t.cube|Kodak Vision 800T|Develop|Cine|photo
+dev_kodak_vision2_100t.cube|Kodak Vision2 100T|Develop|Cine|photo
+dev_kodak_vision2_200t.cube|Kodak Vision2 200T|Develop|Cine|photo
+dev_kodak_vision2_250d.cube|Kodak Vision2 250D|Develop|Cine|photo
+dev_kodak_vision2_500t.cube|Kodak Vision2 500T|Develop|Cine|photo
+dev_kodak_vision2_50d.cube|Kodak Vision2 50D|Develop|Cine|photo
+dev_kodak_vision2_expression_500t.cube|Kodak Vision2 Expression 500T|Develop|Cine|photo
+dev_kodak_vision3_200t.cube|Kodak Vision3 200T|Develop|Cine|photo
+dev_kodak_vision3_250d.cube|Kodak Vision3 250D|Develop|Cine|photo
+dev_kodak_vision3_500t.cube|Kodak Vision3 500T|Develop|Cine|photo
+dev_kodak_vision3_50d.cube|Kodak Vision3 50D|Develop|Cine|photo
